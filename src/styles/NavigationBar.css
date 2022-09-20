@@ -1,0 +1,13 @@
+.navLink {
+  text-decoration: none;
+  padding: 0 1rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+  color: var(--color-primary) !important;
+  font-weight: 500;
+}
