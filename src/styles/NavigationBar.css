@@ -11,3 +11,31 @@
   color: var(--color-primary) !important;
   font-weight: 500;
 }
+.dropdown-menu li {
+  position: relative;
+}
+.dropdown-menu .dropdown-submenu {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: -7px;
+  border-radius: 5px;
+}
+.dropdown-submenu-dark {
+  background-color: #343a40 !important;
+}
+.dropdown-submenu-dark .dropdown-item {
+  color: #dee2e6 !important;
+}
+.dropdown-menu .dropdown-submenu-left {
+  right: 100%;
+  left: auto;
+}
+.dropdown-menu > li:hover > .dropdown-submenu {
+  display: block;
+}
+.navItemLogo {
+  color: var(--frontColor) !important;
+  margin-left: 10px;
+  margin-right: 10px;
+}

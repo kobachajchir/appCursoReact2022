@@ -1,10 +1,24 @@
+import { useContext } from "react";
 import { CartFill } from "react-bootstrap-icons";
+import { Link } from "react-router-dom";
+import { CartContext } from "../context/CartContext";
+import "./../styles/CartWidget.css";
 
 export default function CartWidget() {
+  const { quantity, total } = useContext(CartContext);
   return (
-    <div style={{ display: "inline-flex" }}>
-      <CartFill size={20} />
-      <p style={{ margin: "0px", marginLeft: "5px" }}>0</p>
-    </div>
+    <Link
+      to={"/cart"}
+      style={{ display: "flex", alignItems: "center" }}
+      className="navItemLogo"
+    >
+      <CartFill />
+      {quantity > 0 && (
+        <>
+          <span className="cartItemCounter">{quantity}</span>
+          <span className="cartItemCounter">${total}</span>
+        </>
+      )}
+    </Link>
   );
 }

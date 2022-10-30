@@ -1,46 +1,62 @@
-import { useState } from "react";
+import { useEffect } from "react";
+import { useContext, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import { DashLg, PlusLg } from "react-bootstrap-icons";
+import { CartContext } from "../context/CartContext";
+import "./../styles/ItemCount.css";
+import ToCartButton from "./ToCartButton";
 
-export default function ItemCount({ stock, initial, onAdd }) {
-  const [count, setCount] = useState(initial);
-  const iconSize = 20;
-  const add = () => {
-    if (count < stock) {
-      setCount(count + 1);
-    }
+const iconSize = 20;
+
+export function ItemCount({ product }) {
+  const { cart, addItem, isInCart } = useContext(CartContext);
+  const [quantity, setQuantity] = useState(1);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const handleMinusOne = () => {
+    quantity > 1 && setQuantity(quantity - 1);
   };
-
-  const remove = () => {
-    if (count > 1) {
-      setCount(count - 1);
-    }
+  const handlePlusOne = () => {
+    quantity < product.stock && setQuantity(quantity + 1);
   };
-
+  useEffect(() => {
+    if (isInCart(product.id)) {
+      setAddedToCart(true);
+    }
+  }, [cart]);
   return (
-    <>
-      <Col className="itemCount d-flex justify-content-center" xs={12}>
-        <button onClick={remove}>
-          <DashLg size={iconSize} />
-        </button>
-        <p
-          style={{ paddingLeft: 25, paddingRight: 25, marginBottom: 0 }}
-          className="itemCount d-flex align-self-center"
-          xs={12}
-        >
-          {count}
-        </p>
-        <button onClick={add}>
-          <PlusLg size={iconSize} />
-        </button>
-      </Col>
-      <Col
-        className="itemCount d-flex justify-content-center"
-        xs={12}
-        style={{ marginTop: 10 }}
-      >
-        <button onClick={() => onAdd(count)}>Add to cart</button>
-      </Col>
-    </>
+    <div id={"itemCounter" + product.id}>
+      {addedToCart == false ? (
+        <>
+          <Row className="input-group mb-3">
+            <button className="quantityButton col-2" onClick={handleMinusOne}>
+              <DashLg size={iconSize}></DashLg>
+            </button>
+            <label className="col-md-2 col-6 text-center form-control">
+              {quantity}
+            </label>
+            <button className="quantityButton col-2" onClick={handlePlusOne}>
+              <PlusLg size={iconSize}></PlusLg>
+            </button>
+          </Row>
+          <div className="w-100"></div>
+          <Row as={Col} xs={3} className="justify-content-center">
+            <a
+              className="btn btn-danger addToCart"
+              onClick={() => {
+                console.log("ADD TO CART " + product.code);
+                addItem(product, quantity);
+                setAddedToCart(true);
+              }}
+            >
+              Agregar al carrito
+            </a>
+          </Row>
+        </>
+      ) : (
+        <Row as={Col} xs={3} className="justify-content-center">
+          <ToCartButton />
+        </Row>
+      )}
+    </div>
   );
 }

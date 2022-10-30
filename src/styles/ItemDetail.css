@@ -1,0 +1,9 @@
+.imageDetailContainer {
+  display: grid;
+}
+.itemDetailImg {
+  justify-self: center;
+}
+.itemDetailContainer {
+  align-self: center;
+}

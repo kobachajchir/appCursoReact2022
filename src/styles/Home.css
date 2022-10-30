@@ -1,0 +1,11 @@
+.canvasImageBox {
+  height: 33vh;
+}
+.canvasImage {
+  object-fit: cover;
+  height: inherit;
+  width: inherit;
+}
+.homeContainer {
+  background-color: #424242;
+}
