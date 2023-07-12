@@ -2,11 +2,19 @@ import { lazy, Suspense, useEffect } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useParams, Link } from "react-router-dom";
 import { ItemCount } from "./ItemCount";
+import { Col } from "react-bootstrap";
 
 function Item(props) {
-  const imgUrl = new URL(props.item.picture, import.meta.url).href;
+  const imgUrl = new URL(props.item.picture[0], import.meta.url).href;
   return (
-    <div className="card col-6 offset-3 offset-md-0 col-md-4" key={props.index}>
+    <Col
+      xs={10}
+      md={5}
+      lg={3}
+      className="card"
+      key={props.index}
+      style={{ margin: "5px" }}
+    >
       <LazyLoadImage
         className="card-img-top"
         alt={props.item.code + "ProdImg"}
@@ -24,7 +32,7 @@ function Item(props) {
           </Link>
         </div>
       </div>
-    </div>
+    </Col>
   );
 }
 

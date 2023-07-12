@@ -1,6 +1,23 @@
 .quantityButton {
   border: none !important;
+  background: green;
+  color: white;
+}
+.quantityButton:disabled {
   background: lightgrey;
+  color: black;
 }
 .addToCart {
+  border: none !important;
+  background: green;
+  color: white;
+  margin-left: "10px";
+}
+@media (max-width: 991.98px) {
+  .quantityButton {
+    margin-bottom: 20px;
+  }
+  .addToCart {
+    margin-left: 0px;
+  }
 }

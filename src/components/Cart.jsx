@@ -1,13 +1,20 @@
 import { addDoc, getFirestore } from "firebase/firestore";
 import { useContext, useEffect } from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import { Check, House, HouseFill, TrashFill } from "react-bootstrap-icons";
+import {
+  Cart2,
+  Check,
+  House,
+  HouseFill,
+  TrashFill,
+} from "react-bootstrap-icons";
 import { Link, useNavigate } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
 import CartItem from "./CartItem";
 import CartItemActions from "./CartItemActions";
 import CheckOut from "./Checkout";
 import GoHomeButton from "./GoHomeButton";
+import { useMediaQuery } from "react-responsive";
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -21,6 +28,7 @@ export default function Cart() {
     total,
     quantity,
   } = useContext(CartContext);
+  const isLg = useMediaQuery({ query: "(max-width: 992px)" });
   useEffect(() => {
     console.log(cart);
   }, []);
@@ -63,11 +71,11 @@ export default function Cart() {
       <Container className="container">
         <Row className="justify-content-center">
           <Col xs={12} className="text-center">
-            <h1>Cart</h1>
+            <h1></h1>
           </Col>
           <div className="cartContainer">
             {cart.length > 0 ? (
-              <>
+              <Row className="" style={{ backgroundColor: "#f5f5f5" }}>
                 {cart.map((cartItem) => (
                   <Col xs={12}>
                     <Row className="justify-content-center">
@@ -84,26 +92,61 @@ export default function Cart() {
                     </Row>
                   </Col>
                 ))}
+                <Col
+                  xs={12}
+                  lg={4}
+                  className="text-center"
+                  style={{ backgroundColor: "#f5f5f5", marginLeft: "10px" }}
+                  disabled
+                >
+                  <h3 style={{ marginTop: "10px", marginBottom: "25px" }}>
+                    Resumen de compra
+                  </h3>
+                </Col>
+                <Col xs={12} className="text-center">
+                  <Row className="justify-content-center">
+                    <Col
+                      xs={12}
+                      lg={4}
+                      className={`${!isLg ? "d-flex justify-content-end" : ""}`}
+                    >
+                      <button className="btn btn-danger" onClick={clear}>
+                        Eliminar carrito
+                      </button>
+                    </Col>
+                    <Col
+                      xs={12}
+                      lg={4}
+                      className={`${
+                        !isLg ? "d-flex justify-content-start" : ""
+                      }`}
+                    >
+                      <CheckOut onClick={createOrder} />
+                    </Col>
+                  </Row>
+                </Col>
                 <Col xs={12} className="text-center">
                   <h3>Total: ${total}</h3>
                 </Col>
-                <Col xs={12} className="text-center">
-                  <button className="btn btn-danger" onClick={clear}>
-                    <TrashFill size={20} className="align-self-center" />
-                    Clear Cart
-                  </button>
-                  <CheckOut onClick={createOrder} />
-                </Col>
-              </>
+              </Row>
             ) : (
-              <>
-                <Col xs={12} className="text-center">
-                  <h3>Your cart is empty</h3>
-                </Col>
-                <Col xs={12} className="text-center">
+              <Row
+                className="justify-content-center"
+                style={{ marginTop: "25px", marginBottom: "25px" }}
+              >
+                <Col
+                  xs={12}
+                  lg={7}
+                  className="text-center"
+                  style={{ backgroundColor: "#f5f5f5", padding: "100px" }}
+                >
+                  <Cart2 size={100} />
+                  <h3 style={{ marginTop: "10px", marginBottom: "25px" }}>
+                    No agregaste nada aun
+                  </h3>
                   <GoHomeButton />
                 </Col>
-              </>
+              </Row>
             )}
           </div>
         </Row>

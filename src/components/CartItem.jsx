@@ -5,7 +5,7 @@ import "../styles/CartItem.css";
 const iconSize = 20;
 
 export default function CartItem({ product, quantity }) {
-  const imgUrl = new URL(product.picture, import.meta.url).href;
+  const imgUrl = new URL(product.picture[0], import.meta.url).href;
   return (
     <>
       <Col xs="auto" className="align-self-center">

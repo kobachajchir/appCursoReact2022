@@ -20,7 +20,8 @@
 }
 
 #root {
-  height: 100vh;
+  position: absolute;
+  top: 0;
   width: 100vw;
   margin: 0 !important;
   padding: 0 !important;

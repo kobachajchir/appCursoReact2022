@@ -5,8 +5,7 @@ import { DashLg, PlusLg } from "react-bootstrap-icons";
 import { CartContext } from "../context/CartContext";
 import "./../styles/ItemCount.css";
 import ToCartButton from "./ToCartButton";
-
-const iconSize = 20;
+import { ProductCountButton } from "./ProductCountButton";
 
 export function ItemCount({ product }) {
   const { cart, addItem, isInCart } = useContext(CartContext);
@@ -27,29 +26,46 @@ export function ItemCount({ product }) {
     <div id={"itemCounter" + product.id}>
       {addedToCart == false ? (
         <>
-          <Row className="input-group mb-3">
-            <button className="quantityButton col-2" onClick={handleMinusOne}>
-              <DashLg size={iconSize}></DashLg>
-            </button>
-            <label className="col-md-2 col-6 text-center form-control">
-              {quantity}
-            </label>
-            <button className="quantityButton col-2" onClick={handlePlusOne}>
-              <PlusLg size={iconSize}></PlusLg>
-            </button>
-          </Row>
           <div className="w-100"></div>
-          <Row as={Col} xs={3} className="justify-content-center">
-            <a
-              className="btn btn-danger addToCart"
-              onClick={() => {
-                console.log("ADD TO CART " + product.code);
-                addItem(product, quantity);
-                setAddedToCart(true);
-              }}
+          <Row className="justify-content-center">
+            <Col
+              xs={6}
+              lg={3}
+              lg-offset={2}
+              className="input-group-prepend row justify-content-center justify-items-center"
+              style={{ marginRight: "10px" }}
             >
-              Agregar al carrito
-            </a>
+              <ProductCountButton
+                stock={product.stock}
+                quantity={quantity}
+                setQuantity={setQuantity}
+                isMinus
+              />
+              <label className="col text-center form-control">{quantity}</label>
+              <ProductCountButton
+                stock={product.stock}
+                quantity={quantity}
+                setQuantity={setQuantity}
+                isPlus
+              />
+            </Col>
+            <Col
+              xs={8}
+              lg={5}
+              lg-offset={2}
+              className="row justify-content-center justify-items-center"
+            >
+              <a
+                className="btn btn-danger addToCart"
+                onClick={() => {
+                  console.log("ADD TO CART " + product.code);
+                  addItem(product, quantity);
+                  setAddedToCart(true);
+                }}
+              >
+                Agregar al carrito
+              </a>
+            </Col>
           </Row>
         </>
       ) : (

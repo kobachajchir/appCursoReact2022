@@ -21,11 +21,19 @@ export default function CartItemActions({ product, quantity }) {
   return (
     <>
       <Col className="align-self-center" xs={"auto"}>
-        <button className="btn btn-primary" onClick={handleMinusOne}>
+        <button
+          className="quantityButton col-2 col-lg-auto"
+          disabled={quantity < 2}
+          onClick={handleMinusOne}
+        >
           -
         </button>
         <span className="mx-2">{itemQuantity}</span>
-        <button className="btn btn-primary" onClick={handlePlusOne}>
+        <button
+          className="quantityButton col-2 col-lg-auto"
+          disabled={quantity >= product.stock}
+          onClick={handlePlusOne}
+        >
           +
         </button>
       </Col>
@@ -34,7 +42,7 @@ export default function CartItemActions({ product, quantity }) {
           className="btn btn-danger"
           onClick={() => removeItem(product.id)}
         >
-          Remove
+          Eliminar
         </button>
       </Col>
     </>

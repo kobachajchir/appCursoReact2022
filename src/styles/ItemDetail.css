@@ -7,3 +7,40 @@
 .itemDetailContainer {
   align-self: center;
 }
+.titleDetail {
+  text-align: center;
+  font-family: "Titillium Web", sans-serif;
+  font-size: 4rem;
+  margin-bottom: 25px;
+}
+.descriptionDetail {
+  text-align: center;
+  font-family: "Titillium Web", sans-serif;
+  font-size: 2rem;
+  margin-bottom: 25px;
+}
+.promotionEnding {
+  text-align: center;
+  font-family: "Titillium Web", sans-serif;
+  font-size: 2rem;
+  margin-bottom: 25px;
+  color: red;
+}
+.priceDetail {
+  font-family: "Titillium Web", sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+}
+.salePrice {
+  font-family: "Titillium Web", sans-serif;
+  font-weight: 700;
+  color: red;
+  font-size: 2.5rem;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.stockDetail {
+  font-family: "Titillium Web", sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+}

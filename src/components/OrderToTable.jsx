@@ -1,84 +1,152 @@
-import { Col, Container, Row, Table } from "react-bootstrap";
+import { Col, Row, Table } from "react-bootstrap";
 
 export default function OrderToTable({ order }) {
   return (
-    <>
-      <Container>
-        <Row style={{ marginTop: "25px", marginBottom: "25px" }}>
-          <Col xs={12} className="text-center">
-            <h2>Order ID: {order.id}</h2>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={12} className="justify-content-center text-center">
-            <h3>Poducts Info</h3>
-            <Table striped bordered hover>
-              <thead>
+    <Row
+      className={"justify-content-center text-center"}
+      style={{ backgroundColor: "#fafafa" }}
+    >
+      <Col xs={10}>
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th colSpan={2}>Order Info</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Order ID</td>
+              <td>{order.id}</td>
+            </tr>
+            <tr>
+              <td>Date</td>
+              <td>{new Date(order.date.seconds * 1000).toLocaleString()}</td>
+            </tr>
+            <tr>
+              <td>Total</td>
+              <td>${order.total}</td>
+            </tr>
+            <tr>
+              <td>Items</td>
+              <td>
+                <Table striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th>Amount</th>
+                      <th>Code</th>
+                      <th>Price</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {order.items.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.amount}</td>
+                        <td>{item.code}</td>
+                        <td>${item.price}</td>
+                        <td>{item.description}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </td>
+            </tr>
+          </tbody>
+        </Table>
+
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th colSpan={2}>Buyer Info</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>{order.buyer.buyerName}</td>
+            </tr>
+            <tr>
+              <td>Phone</td>
+              <td>{order.buyer.buyerPhone}</td>
+            </tr>
+          </tbody>
+        </Table>
+
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th colSpan={2}>Shipping Info</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Street</td>
+              <td>{order.shipping.address.street}</td>
+            </tr>
+            <tr>
+              <td>House Number</td>
+              <td>{order.shipping.address.houseNumber}</td>
+            </tr>
+            <tr>
+              <td>City</td>
+              <td>{order.shipping.address.city}</td>
+            </tr>
+            <tr>
+              <td>State</td>
+              <td>{order.shipping.address.state}</td>
+            </tr>
+            <tr>
+              <td>Postal Code</td>
+              <td>{order.shipping.address.postalCode}</td>
+            </tr>
+            <tr>
+              <td>Country</td>
+              <td>{order.shipping.address.country}</td>
+            </tr>
+          </tbody>
+        </Table>
+
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th colSpan={2}>Payment Info</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Method</td>
+              <td>{order.payment.method}</td>
+            </tr>
+            {order.payment.method === "card" && (
+              <>
                 <tr>
-                  <th>Item Code</th>
-                  <th>Item Title</th>
-                  <th>Item Description</th>
-                  <th>Item Price</th>
+                  <td>Card Owner</td>
+                  <td>{order.payment.cardInfo.cardOwner}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {order.items.map((item) => (
-                  <tr key={`entry${item.code}`}>
-                    <td>{item.code}</td>
-                    <td>{item.title}</td>
-                    <td>{item.description}</td>
-                    <td>${item.price}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={12} className="justify-content-center text-center">
-            <h3>Buyer Info</h3>
-            <Table striped bordered hover>
-              <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Phone</th>
-                  <th>Address</th>
-                  <th>Postal Code</th>
+                  <td>Due Amount</td>
+                  <td>${order.payment.cardInfo.dueAmount}</td>
                 </tr>
-              </thead>
-              <tbody>
                 <tr>
-                  <td>{order.buyer.username}</td>
-                  <td>{order.buyer.userPhone}</td>
-                  <td>{`${order.buyer.userAddress.street}  ${order.buyer.userAddress.number}, ${order.buyer.userAddress.city}, ${order.buyer.userAddress.state}`}</td>
-                  <td>{`CP: ${order.buyer.userAddress.postalCode}`}</td>
+                  <td>Dues</td>
+                  <td>{order.payment.cardInfo.dues}</td>
                 </tr>
-              </tbody>
-            </Table>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={12} className="justify-content-center text-center">
-            <h3>Order Info</h3>
-            <Table striped bordered hover>
-              <thead>
                 <tr>
-                  <th>Order ID</th>
-                  <th>Order Date</th>
-                  <th>Order Total</th>
+                  <td>Expiration Date</td>
+                  <td>
+                    {order.payment.cardInfo.expirationDate.month}/
+                    {order.payment.cardInfo.expirationDate.year}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
                 <tr>
-                  <td>{order.id}</td>
-                  <td>{order.date}</td>
-                  <td>${order.total}</td>
+                  <td>Last Digits</td>
+                  <td>{order.payment.cardInfo.lastDigits}</td>
                 </tr>
-              </tbody>
-            </Table>
-          </Col>
-        </Row>
-      </Container>
-    </>
+              </>
+            )}
+          </tbody>
+        </Table>
+      </Col>
+    </Row>
   );
 }

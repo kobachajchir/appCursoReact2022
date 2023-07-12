@@ -16,18 +16,18 @@ export default function NavigationBar() {
           <Nav className="me-auto">
             <Nav.Link as={Link}>Pricing</Nav.Link>
             <NavDropdown title="Categorias" id="collasible-nav-dropdown">
-              <NavDropdown.Item as={Link} to={"category/Baterias"}>
-                Baterias
+              <NavDropdown.Item as={Link} to={"category/BatAuto"}>
+                Baterias Autos
+              </NavDropdown.Item>
+              <NavDropdown.Item as={Link} to={"category/BatMoto"}>
+                Baterias Moto
               </NavDropdown.Item>
               <NavDropdown.Item as={Link} to={"category/Radios"}>
                 Radios
               </NavDropdown.Item>
-              <NavDropdown.Item as={Link} to={"category/pipas"}>
-                Pipas
-              </NavDropdown.Item>
               <NavDropdown.Divider />
-              <NavDropdown.Item as={Link} to={"category/kits"}>
-                Kits
+              <NavDropdown.Item as={Link} to={"category"}>
+                Todos los productos
               </NavDropdown.Item>
             </NavDropdown>
           </Nav>

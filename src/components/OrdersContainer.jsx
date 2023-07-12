@@ -22,60 +22,66 @@ export default function OrdersContainer() {
   let addressVal;
   let productsVal;
   const navigate = useNavigate();
-  useEffect(() => {
+  const getOrders = async () => {
     const db = getFirestore();
     const ordersCollection = collection(db, "orders");
     const queryOrders = query(ordersCollection);
-    getDocs(queryOrders).then((snapshot) => {
-      snapshot.docs.map((order) => {
-        orderDoc = order.data();
-        userDoc = getUserById(orderDoc.buyer).then((user) => {
-          userVal = user;
-          addressDoc = getAddressById(userVal.userAddress)
-            .then((address) => {
-              addressVal = address;
-            })
-            .then(() => {
-              productDoc = getProductsById(orderDoc.items).then((products) => {
-                productsVal = products;
-              });
-            })
-            .finally(() => {
-              const orderParsed = {
-                id: order.id,
-                buyer: {
-                  ...userVal,
-                  userAddress: addressVal,
-                  createdOn: userVal.createdOn.toDate().toDateString(),
-                },
-                items: productsVal,
-                date: orderDoc.date.toDate().toDateString(),
-                total: orderDoc.total,
-              };
-              setOrders((orders) => [...orders, orderParsed]);
-              setLoading(false);
-            });
-        });
-      });
+    const ordersSnapshot = await getDocs(queryOrders);
+
+    const ordersData = ordersSnapshot.docs.map((order) => {
+      const orderData = order.data();
+
+      const buyerInfo = {
+        buyerName: orderData.buyer.username,
+        buyerPhone: orderData.buyer.userPhone,
+      };
+
+      const shippingAddress = {
+        street: orderData.shipping.address.street,
+        houseNumber: orderData.shipping.address.houseNumber,
+        city: orderData.shipping.address.city,
+        state: orderData.shipping.address.state,
+        postalCode: orderData.shipping.address.postalCode,
+        country: orderData.shipping.address.country,
+      };
+
+      const cardInfo = orderData.payment.cardInfo;
+
+      return {
+        id: order.id,
+        buyer: buyerInfo,
+        date: orderData.date,
+        total: orderData.total,
+        items: orderData.items,
+        payment: {
+          method: orderData.payment.card ? "card" : "cash",
+          cardInfo: {
+            cardOwner: cardInfo.cardOwner,
+            dueAmount: cardInfo.dueAmount,
+            dues: cardInfo.dues,
+            expirationDate: {
+              month: cardInfo.expirationDate.month,
+              year: cardInfo.expirationDate.year,
+            },
+            lastDigits: cardInfo.lastDigits,
+          },
+        },
+        shipping: {
+          isShipped: orderData.isShipped,
+          address: shippingAddress,
+        },
+        // Other order details
+      };
     });
-    const getAddressById = async (addressDocRef) => {
-      const addressSnapshot = await getDoc(addressDocRef);
-      return addressSnapshot.data();
-    };
-    const getUserById = async (userDocRef) => {
-      const userSnapshot = await getDoc(userDocRef);
-      return userSnapshot.data();
-    };
-    const getProductsById = async (productsDocRef) => {
-      let products = [];
-      productsDocRef.map((productDocRef) => {
-        const productSnapshot = getDoc(productDocRef).then((product) => {
-          products.push(product.data());
-        });
-      });
-      return products;
-    };
+
+    setOrders(ordersData);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    getOrders();
   }, []);
+
   function navigateToOrderDetail(index, orderId) {
     navigate(`/order/${orderId}`, { state: orders[index] });
   }
