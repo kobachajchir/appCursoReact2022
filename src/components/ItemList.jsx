@@ -5,12 +5,10 @@ import { Container, Row } from "react-bootstrap";
 
 export default function ItemList({ productos }) {
   return (
-    <Container className="cardContainer" fluid>
-      <Row className="justify-content-center">
-        {productos.map((product) => (
-          <Item item={product} key={product.id} index={product.id} />
-        ))}
-      </Row>
-    </Container>
+    <>
+      {productos.map((product) => (
+        <Item item={product} key={product.id} index={product.id} />
+      ))}
+    </>
   );
 }

@@ -27,6 +27,8 @@ export default function Cart() {
     buyCart,
     total,
     quantity,
+    saleDiscount,
+    totalWithDiscount,
   } = useContext(CartContext);
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
   useEffect(() => {
@@ -58,13 +60,6 @@ export default function Cart() {
     };
     console.log("Order: ", order);
     navigate(`/order/1000`, { state: { ...order, id: "test123" } });
-    /*
-    const db = getFirestore();
-    const orderCollection = collection(db, "orders");
-    addDoc(orderCollection, order).then(({ id }) => {
-      orderId = id;
-      console.log("Order created successfully", orderId);
-    });*/
   }
   return (
     <>
@@ -75,23 +70,10 @@ export default function Cart() {
           </Col>
           <div className="cartContainer">
             {cart.length > 0 ? (
-              <Row className="" style={{ backgroundColor: "#f5f5f5" }}>
-                {cart.map((cartItem) => (
-                  <Col xs={12}>
-                    <Row className="justify-content-center">
-                      <CartItem
-                        key={`cartIem${cartItem.item.id}`}
-                        product={cartItem.item}
-                        quantity={cartItem.quantity}
-                      />
-                      <CartItemActions
-                        key={`cartItemActions${cartItem.item.id}`}
-                        product={cartItem.item}
-                        quantity={cartItem.quantity}
-                      />
-                    </Row>
-                  </Col>
-                ))}
+              <Row
+                className="justify-content-center"
+                style={{ backgroundColor: "#f5f5f5" }}
+              >
                 <Col
                   xs={12}
                   lg={4}
@@ -101,6 +83,39 @@ export default function Cart() {
                 >
                   <h3 style={{ marginTop: "10px", marginBottom: "25px" }}>
                     Resumen de compra
+                  </h3>
+                </Col>
+                {cart.map((cartItem) => (
+                  <Col xs={12}>
+                    <Row
+                      className="justify-content-center"
+                      style={{ marginTop: "10px", marginBottom: "10px" }}
+                    >
+                      <CartItem
+                        key={`cartItem${cartItem.item.id}`}
+                        product={cartItem.item}
+                        quantity={cartItem.quantity}
+                        sale={cartItem.item.sale}
+                      />
+                      <CartItemActions
+                        key={`cartItemActions${cartItem.item.id}`}
+                        product={cartItem.item}
+                        quantity={cartItem.quantity}
+                      />
+                    </Row>
+                  </Col>
+                ))}
+                <Col xs={12} className="text-center">
+                  {saleDiscount !== 0 && (
+                    <>
+                      <h5 style={{ margin: 0 }}>Subtotal: ${total}</h5>
+                      <h5 style={{ margin: 0, color: "red" }}>
+                        Descuentos: ${saleDiscount}
+                      </h5>
+                    </>
+                  )}
+                  <h3 style={{ marginTop: "10px" }}>
+                    Total: ${totalWithDiscount}
                   </h3>
                 </Col>
                 <Col xs={12} className="text-center">
@@ -124,9 +139,6 @@ export default function Cart() {
                       <CheckOut onClick={createOrder} />
                     </Col>
                   </Row>
-                </Col>
-                <Col xs={12} className="text-center">
-                  <h3>Total: ${total}</h3>
                 </Col>
               </Row>
             ) : (

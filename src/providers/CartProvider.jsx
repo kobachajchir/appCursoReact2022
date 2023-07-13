@@ -5,8 +5,13 @@ export default function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
   const [quantity, setQuantity] = useState(0);
   const [total, setTotal] = useState(0);
+  const [saleDiscount, setSaleDiscount] = useState(0);
+  const [totalWithDiscount, setTotalWithDiscount] = useState(0);
 
-  function addItem(item, quantity) {
+  function addItem(item, quantity, isOnSale, sale = null) {
+    if (isOnSale) {
+      item = { ...item, sale };
+    }
     if (isInCart(item.id)) {
       const newCart = cart.map((cartItem) => {
         if (cartItem.item.id === item.id) {
@@ -50,10 +55,20 @@ export default function CartProvider({ children }) {
 
   function calculateTotal() {
     let total = 0;
+    let discount = 0;
     cart.forEach((cartItem) => {
       total += cartItem.item.price * cartItem.quantity;
+      if (cartItem.item.sale) {
+        discount +=
+          (cartItem.item.price *
+            cartItem.quantity *
+            cartItem.item.sale.discountPercentage) /
+          100;
+      }
     });
     setTotal(total);
+    setSaleDiscount(discount);
+    setTotalWithDiscount(total - discount);
   }
 
   function calculateQuantity() {
@@ -99,6 +114,8 @@ export default function CartProvider({ children }) {
         buyCart,
         total,
         quantity,
+        saleDiscount,
+        totalWithDiscount,
       }}
     >
       {children}

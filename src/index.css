@@ -1,5 +1,6 @@
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Titillium Web", sans-serif !important;
+  --bs-body-font-family: "Titillium Web", sans-serif !important;
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
@@ -17,6 +18,29 @@
   --color-primary: gray;
   --accentColor: #f0c14b;
   --frontColor: #fff;
+}
+
+[data-bs-theme="dark"] {
+  color: var(--bs-light-text-emphasis) !important;
+  background-color: var(--bs-body-bg) !important;
+}
+[data-bs-theme="dark"] .element {
+  color: var(--bs-light-text-emphasis) !important;
+  background-color: var(--bs-body-bg) !important;
+}
+[data-bs-theme="dark"].themeSecondaryBgColor {
+  background-color: var(--bs-secondary-bg) !important;
+}
+[data-bs-theme="dark"].themeTerciaryBgColor {
+  background-color: var(--bs-tertiary-bg) !important;
+}
+[data-bs-theme="dark"].themeEmphasisBgColor {
+  color: var(--bs-secondary-bg-subtle) !important;
+  background-color: var(--bs-emphasis-color) !important;
+}
+[data-bs-theme="dark"].themeEmphasisColor {
+  color: var(--bs-emphasis-color) !important;
+  background-color: unset !important;
 }
 
 #root {

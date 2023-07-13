@@ -10,12 +10,14 @@ import { useMediaQuery } from "react-responsive";
 function ItemDetail(props) {
   const [item, setItem] = useState(props.item);
   const [isOnSale, setIsOnSale] = useState(props.sale.isOnSale);
+  const [saleObject, setSaleObject] = useState({});
   const [salePrice, setSalePrice] = useState("");
   const [endingDate, setEndingDate] = useState("");
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
   useEffect(() => {
     setIsOnSale(props.sale.isOnSale);
     if (props.sale.isOnSale) {
+      setSaleObject(props.sale);
       setSalePrice(
         item.price - (item.price * props.sale.discountPercentage) / 100
       );
@@ -77,7 +79,7 @@ function ItemDetail(props) {
             <h5 className="priceDetail">${item.price}</h5>
           )}
           <p className="stockDetail">En stock: {item.stock}</p>
-          <ItemCount product={item} />
+          <ItemCount product={item} isOnSale={isOnSale} sale={saleObject} />
         </Col>
       </Row>
     </Container>

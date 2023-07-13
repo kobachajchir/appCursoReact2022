@@ -1,0 +1,35 @@
+.filterControls {
+  background-color: #dcdcdc;
+  color: #505050;
+}
+.filterButton {
+  color: #505050;
+  margin-left: 2.5px;
+  margin-right: 2.5px;
+}
+.activeFilter {
+  color: var(--bs-danger);
+}
+.filterDiv {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+.filterRadios {
+  height: 100%;
+  align-items: center;
+}
+.disabledFilters {
+  background-color: #787878;
+  cursor: not-allowed;
+}
+.changeFilterOrdenBtn {
+  background-color: #dcdcdc;
+  color: #505050;
+}
+.changeFilterOrdenBtn:disabled {
+  background-color: #787878 !important;
+  cursor: not-allowed;
+}
+.radioInputFilter:disabled {
+  cursor: not-allowed !important;
+}

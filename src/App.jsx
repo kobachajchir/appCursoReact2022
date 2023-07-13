@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import "./App.css";
 import Navigationbar from "./components/Navbar";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -13,7 +13,9 @@ import CartProvider from "./providers/CartProvider";
 import OrdersContainer from "./components/OrdersContainer";
 import Order from "./components/Order";
 import { initializeApp } from "firebase/app";
-export const FirebaseConfigContext = createContext();
+import { collection, getDocs, getFirestore } from "firebase/firestore";
+import AboutUs from "./components/AboutUs";
+export const GeneralCompany = createContext();
 const firebaseConfig = {
   apiKey: "AIzaSyClyM0t39WQ8SI37pIZycGy2o02d57byxs",
   authDomain: "pachacreaciones3d.firebaseapp.com",
@@ -25,21 +27,55 @@ const firebaseConfig = {
 initializeApp(firebaseConfig);
 
 function App() {
-  return (
+  const db = getFirestore();
+  const [navCat, setNavCat] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [companyInfo, setCompanyInfo] = useState();
+  const fetchCompanyInfo = async () => {
+    const db = getFirestore();
+    const data = await getDocs(collection(db, "companyInfo"));
+    const results = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+    console.log(results);
+    return results;
+  };
+  const fetchCategories = async () => {
+    const db = getFirestore();
+    const data = await getDocs(collection(db, "categories"));
+    const results = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+    console.log(results);
+    return results;
+  };
+  useEffect(() => {
+    Promise.all([fetchCompanyInfo(), fetchCategories()])
+      .then(([info, cats]) => {
+        setCompanyInfo(info[0]);
+        setNavCat(cats);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        // You might also want to set an error state here to display an error message
+      });
+  }, []);
+  return !loading ? (
     <>
-      <FirebaseConfigContext.Provider value={firebaseConfig}>
+      <GeneralCompany.Provider
+        value={{ companyInfo: companyInfo, productCategories: navCat }}
+      >
         <CartProvider>
           <BrowserRouter>
             <Navigationbar />
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/cart" element={<Cart />} />
+              <Route exact path="/aboutUs" element={<AboutUs />} />
+              <Route exact path="/cart" element={<Cart />} />
               <Route
                 exact
                 path="/category/:idCat"
                 element={<ItemListContainer />}
               />
               <Route exact path="/category/" element={<ItemListContainer />} />
+
               <Route
                 exact
                 path="/product/:idProd"
@@ -52,9 +88,9 @@ function App() {
             </Routes>
           </BrowserRouter>
         </CartProvider>
-      </FirebaseConfigContext.Provider>
+      </GeneralCompany.Provider>
     </>
-  );
+  ) : null; //Agregar spinner de carga aca
 }
 
 export default App;

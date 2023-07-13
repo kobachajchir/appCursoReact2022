@@ -7,7 +7,7 @@ import "./../styles/ItemCount.css";
 import ToCartButton from "./ToCartButton";
 import { ProductCountButton } from "./ProductCountButton";
 
-export function ItemCount({ product }) {
+export function ItemCount({ product, isOnSale, sale }) {
   const { cart, addItem, isInCart } = useContext(CartContext);
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
@@ -59,7 +59,7 @@ export function ItemCount({ product }) {
                 className="btn btn-danger addToCart"
                 onClick={() => {
                   console.log("ADD TO CART " + product.code);
-                  addItem(product, quantity);
+                  addItem(product, quantity, isOnSale, sale);
                   setAddedToCart(true);
                 }}
               >

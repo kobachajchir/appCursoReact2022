@@ -3,6 +3,7 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useParams, Link } from "react-router-dom";
 import { ItemCount } from "./ItemCount";
 import { Col } from "react-bootstrap";
+import { Star, StarFill } from "react-bootstrap-icons";
 
 function Item(props) {
   const imgUrl = new URL(props.item.picture[0], import.meta.url).href;
@@ -11,9 +12,10 @@ function Item(props) {
       xs={10}
       md={5}
       lg={3}
-      className="card"
+      className="card themeEmphasisBgColor"
       key={props.index}
       style={{ margin: "5px" }}
+      data-bs-theme="dark"
     >
       <LazyLoadImage
         className="card-img-top"
@@ -21,15 +23,28 @@ function Item(props) {
         src={imgUrl}
       />
       <div className="card-body">
-        <h5 className="card-title">{props.item.title}</h5>
+        <div
+          className="d-flex flex-row align-items-center"
+          style={{ justifyContent: "space-between" }}
+        >
+          <h5 className="card-title" style={{ margin: 0 }}>
+            {props.item.title}
+          </h5>
+          <div className="d-flex flex-row align-items-center">
+            <StarFill color="#CD9D00"></StarFill>
+            <p style={{ margin: 0 }}>{props.item.rating}</p>
+          </div>
+        </div>
         <p className="card-text">{props.item.description}</p>
-        <div className="col-12 row justify-content-center">
-          <Link
-            to={"/product/" + props.item.id}
-            className="btn btn-primary seeProductInfo col-6"
-          >
-            Ver producto
-          </Link>
+        <div className="row justify-content-center">
+          <Col xs={10} className="text-center">
+            <Link
+              to={"/product/" + props.item.id}
+              className="btn btn-primary seeProductInfo"
+            >
+              Ver producto
+            </Link>
+          </Col>
         </div>
       </div>
     </Col>
