@@ -1,40 +1,73 @@
 import { Link, NavLink } from "react-router-dom";
 import "./../styles/NavigationBar.css";
-import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
+import { Container, Nav, Navbar, NavDropdown, NavItem } from "react-bootstrap";
 import { collection, getDocs, getFirestore } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import { GeneralCompany } from "../App";
-import { CartFill, PersonCircle } from "react-bootstrap-icons";
+import { CartFill, MoonFill, PersonCircle } from "react-bootstrap-icons";
 import { useMediaQuery } from "react-responsive";
 import { CartContext } from "../context/CartContext";
+import ThemeChanger from "./ThemeChanger";
 
 export default function NavigationBar() {
-  const { companyInfo: compInfo, productCategories: categories } =
-    useContext(GeneralCompany);
+  const {
+    companyInfo: compInfo,
+    productCategories: categories,
+    isUserLogged: isUserLogged,
+  } = useContext(GeneralCompany);
   const [navbarBrand, setNavbarBrand] = useState(compInfo.companyName);
-  const [isUserLogged, setUserLogged] = useState(false);
   const { quantity, totalWithDiscount } = useContext(CartContext);
   useEffect(() => setNavbarBrand(compInfo.companyName), [compInfo]);
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
   return (
-    <Navbar collapseOnSelect expand="lg" data-bs-theme="dark">
+    <Navbar
+      collapseOnSelect
+      expand="lg"
+      style={{
+        backgroundColor: "var(--bs-dark-bg-subtle)",
+      }}
+    >
       <Container>
-        <Navbar.Brand as={Link} to={"/"}>
+        <Navbar.Brand
+          as={Link}
+          to={"/"}
+          className="order-0"
+          style={{
+            marginRight: !isLg ? "var(--bs-navbar-brand-margin-end)" : "-50px",
+          }}
+        >
           {navbarBrand}
         </Navbar.Brand>
-        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-        <Navbar.Collapse id="responsive-navbar-nav">
+        <Nav.Link
+          className={`d-flex align-items-center ${!isLg ? "order-1" : ""}`}
+          style={{
+            paddingLeft: !isLg ? "8px" : 0,
+            paddingRight: !isLg ? "8px" : 0,
+          }}
+        >
+          <ThemeChanger />
+        </Nav.Link>
+        <Navbar.Toggle
+          aria-controls="responsive-navbar-nav"
+          className={`${!isLg ? "order-last" : ""}`}
+        />
+        <Navbar.Collapse
+          id="responsive-navbar-nav"
+          className={`${!isLg ? "order-2" : ""}`}
+        >
           <Nav className="me-auto">
             <Nav.Link as={Link} to={`aboutUs/`}>
               Sobre nosotros
             </Nav.Link>
             <NavDropdown title="Categorias" id="collasible-nav-dropdown">
-              {categories.map((category) => (
+              {categories.map((category, index) => (
                 <>
                   {category.subcategories ? (
                     <>
                       <NavDropdown.Divider />
-                      <NavDropdown.Header>{category.name}</NavDropdown.Header>
+                      <NavDropdown.Header key={category + index}>
+                        {category.name}
+                      </NavDropdown.Header>
                       {category.subcategories.map((subcategory, index) => (
                         <NavDropdown.Item
                           as={Link}
@@ -66,7 +99,7 @@ export default function NavigationBar() {
             >
               {!isUserLogged ? (
                 <>
-                  <NavDropdown.Item as={Link} to={`/user`}>
+                  <NavDropdown.Item as={Link} to={`/user/login`}>
                     Iniciar sesion
                   </NavDropdown.Item>
                 </>
@@ -74,6 +107,12 @@ export default function NavigationBar() {
                 <>
                   <NavDropdown.Item as={Link} to={`/user`}>
                     Mi perfil
+                  </NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to={`/user/favorites`}>
+                    Favoritos
+                  </NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to={`/user/myOrders`}>
+                    Mis compras
                   </NavDropdown.Item>
                   <NavDropdown.Item as={Link} to={`/user/settings`}>
                     Configuracion
@@ -84,8 +123,6 @@ export default function NavigationBar() {
                   </NavDropdown.Item>
                 </>
               )}
-              <NavDropdown.Divider />
-              <NavDropdown.Item>theme changer</NavDropdown.Item>
             </NavDropdown>
             <Nav.Link
               as={Link}

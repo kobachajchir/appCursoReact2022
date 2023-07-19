@@ -1,23 +1,21 @@
 .quantityButton {
   border: none !important;
-  background: green;
-  color: white;
+  background-color: var(--bs-dark-border-subtle);
+  display: flex;
+  justify-content: center;
+}
+.quantityButton.minus {
+  border-top-right-radius: "5";
+  border-bottom-right-radius: "5";
 }
 .quantityButton:disabled {
-  background: lightgrey;
-  color: black;
+  background-color: var(--bs-danger-border-subtle);
 }
 .addToCart {
   border: none !important;
-  background: green;
-  color: white;
-  margin-left: "10px";
-}
-@media (max-width: 991.98px) {
-  .quantityButton {
-    margin-bottom: 20px;
-  }
-  .addToCart {
-    margin-left: 0px;
-  }
+  background: var(--bs-success);
+  align-items: center;
+  display: flex !important;
+  text-align: center;
+  justify-content: center;
 }

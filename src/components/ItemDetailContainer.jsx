@@ -53,7 +53,7 @@ export default function ItemDetailContainer(props) {
   }, [loading]);
 
   return (
-    <Container fluid style={{ backgroundColor: "#fafafa" }}>
+    <Container fluid>
       <Row>{!loading && <ItemDetail item={product} sale={sale} />}</Row>
     </Container>
   );

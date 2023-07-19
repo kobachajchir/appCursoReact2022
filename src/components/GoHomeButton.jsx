@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 export default function GoHomeButton() {
   return (
     <Link to="/">
-      <Button variant="primary">
+      <Button variant="outline-secondary">
         <HouseFill size={20} className="align-self-center" /> Ir al Inicio
       </Button>
     </Link>

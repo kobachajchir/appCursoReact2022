@@ -1,6 +1,7 @@
 .filterControls {
-  background-color: #dcdcdc;
-  color: #505050;
+  background-color: var(--bs-dark-bg-subtle);
+  color: var(--bs-emphasis-color);
+  border-radius: 15px;
 }
 .filterButton {
   color: #505050;
@@ -19,7 +20,6 @@
   align-items: center;
 }
 .disabledFilters {
-  background-color: #787878;
   cursor: not-allowed;
 }
 .changeFilterOrdenBtn {

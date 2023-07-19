@@ -14,7 +14,11 @@ export function ProductCountButton(props) {
   }, []);
   return (
     <button
-      className="quantityButton col-2 col-lg-auto"
+      className={
+        props.isMinus
+          ? "quantityButton col-2 col-lg-auto minus"
+          : "quantityButton col-2 col-lg-auto plus"
+      }
       disabled={
         props.isMinus ? props.quantity < 2 : props.quantity >= props.stock
       }

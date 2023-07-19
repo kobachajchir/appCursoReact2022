@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import "./App.css";
 import Navigationbar from "./components/Navbar";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -13,8 +13,16 @@ import CartProvider from "./providers/CartProvider";
 import OrdersContainer from "./components/OrdersContainer";
 import Order from "./components/Order";
 import { initializeApp } from "firebase/app";
-import { collection, getDocs, getFirestore } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+} from "firebase/firestore";
 import AboutUs from "./components/AboutUs";
+import FavoritesListContainer from "./components/FavoritesListContainer";
 export const GeneralCompany = createContext();
 const firebaseConfig = {
   apiKey: "AIzaSyClyM0t39WQ8SI37pIZycGy2o02d57byxs",
@@ -31,6 +39,12 @@ function App() {
   const [navCat, setNavCat] = useState([]);
   const [loading, setLoading] = useState(true);
   const [companyInfo, setCompanyInfo] = useState();
+  const [userInfo, setUserInfo] = useState({
+    userDarkMode: true,
+    isUserLogged: true,
+    username: "kobachajchir",
+  });
+  const [favorites, setFavorites] = useState([]);
   const fetchCompanyInfo = async () => {
     const db = getFirestore();
     const data = await getDocs(collection(db, "companyInfo"));
@@ -45,6 +59,19 @@ function App() {
     console.log(results);
     return results;
   };
+  async function fetchFavorites(username) {
+    const q = query(
+      collection(db, "users"),
+      where("username", "==", userInfo.username)
+    );
+    const querySnapshot = await getDocs(q);
+    let favorites;
+    querySnapshot.forEach((doc) => {
+      favorites = doc.data().favorites;
+      console.log(doc.id, " => ", doc.data());
+    });
+    return favorites;
+  }
   useEffect(() => {
     Promise.all([fetchCompanyInfo(), fetchCategories()])
       .then(([info, cats]) => {
@@ -57,10 +84,37 @@ function App() {
         // You might also want to set an error state here to display an error message
       });
   }, []);
+  useEffect(() => {
+    const htmlElement = document.getElementById("htmlElement");
+    htmlElement.setAttribute(
+      "data-bs-theme",
+      !userInfo.userDarkMode ? "light" : "dark"
+    );
+  }, [userInfo.userDarkMode]);
+  const fetchFavoritesCallback = useCallback(async () => {
+    if (userInfo.isUserLogged) {
+      setFavorites(await fetchFavorites(userInfo.username));
+    } else {
+      setFavorites([]);
+    }
+  }, [userInfo.username, userInfo.isUserLogged]);
+  useEffect(() => {
+    fetchFavoritesCallback();
+  }, [fetchFavoritesCallback, userInfo.isUserLogged]);
   return !loading ? (
     <>
       <GeneralCompany.Provider
-        value={{ companyInfo: companyInfo, productCategories: navCat }}
+        value={{
+          companyInfo: companyInfo,
+          productCategories: navCat,
+          isDarkTheme: userInfo.userDarkMode,
+          isUserLogged: userInfo.isUserLogged,
+          username: userInfo.username,
+          userFavorites: favorites,
+          userInfo: userInfo,
+          setUserFavorites: setFavorites,
+          setUserInfo: setUserInfo,
+        }}
       >
         <CartProvider>
           <BrowserRouter>
@@ -84,6 +138,13 @@ function App() {
               <Route exact path="/order/:idOrder" element={<Order />} />
               <Route exact path="/orders" element={<OrdersContainer />} />
               <Route exact path="/user/" element={<User />} />
+              <Route
+                exact
+                path="/user/favorites"
+                element={<FavoritesListContainer />}
+              />
+              <Route exact path="/user/myOrders" element={<User />} />
+              <Route exact path="/user/settings" element={<User />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

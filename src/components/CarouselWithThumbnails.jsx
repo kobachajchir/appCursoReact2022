@@ -20,7 +20,7 @@ const CarouselWithThumbnails = (props) => {
       as={Col}
       xs={12}
       lg={{ span: 6, offset: "auto" }}
-      className={"justify-content-center"}
+      className={isLg ? "justify-content-center" : "justify-content-start"}
       style={{
         marginLeft: !isLg ? "auto" : "",
         marginRight: !isLg ? "auto" : "",
@@ -32,6 +32,7 @@ const CarouselWithThumbnails = (props) => {
         as={Col}
         xs={10}
         lg={8}
+        indicators={false}
       >
         {imageUrls.map((imageUrl, imageIndex) => (
           <Carousel.Item key={imageIndex}>
@@ -40,10 +41,6 @@ const CarouselWithThumbnails = (props) => {
               alt={props.item.code + "ProdImg" + imageIndex}
               src={imageUrl}
             />
-            <Carousel.Caption>
-              <h3>{"Image " + (imageIndex + 1)}</h3>
-              <p>{"This is image " + (imageIndex + 1)}</p>
-            </Carousel.Caption>
           </Carousel.Item>
         ))}
       </Carousel>

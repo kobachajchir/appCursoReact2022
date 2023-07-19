@@ -7,7 +7,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { useEffect } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useParams } from "react-router-dom";
@@ -16,13 +16,20 @@ import ItemList from "./ItemList";
 import { GeneralCompany } from "../App";
 
 export default function ItemListContainer() {
+  let startAt = 0;
   const [prodList, setProdList] = useState([]);
   const [itemFilter, setItemFilter] = useState({
     criteria: "none",
     order: "desc",
   });
   const { idCat } = useParams();
-  const { productCategories: categories } = useContext(GeneralCompany);
+  const {
+    productCategories: categories,
+    isUserLogged: isUserLogged,
+    username: username,
+    userFavorites: favorites,
+    setUserFavorites: setUserFavorites,
+  } = useContext(GeneralCompany);
   const title = () => {
     let titleName = ""; // Initialize an empty string to hold the title name
 
@@ -42,9 +49,15 @@ export default function ItemListContainer() {
 
     return titleName; // Return the title name
   };
-  const filters = ["Nuevos", "Precio", "Mas comprados", "Valoracion"];
+  const filters = [
+    "Nuevos",
+    "Precio",
+    "Mas comprados",
+    "Valoracion",
+    "Favoritos",
+  ];
   const db = getFirestore();
-  async function getAllProducts() {
+  async function fetchProducts(idCat) {
     let filter;
     switch (itemFilter.criteria) {
       case "Nuevos":
@@ -59,72 +72,57 @@ export default function ItemListContainer() {
       case "Valoracion":
         filter = "rating";
         break;
-    }
-    const queryFilters =
-      itemFilter.criteria === "none" || !filter
-        ? collection(db, "products")
-        : query(
-            collection(db, "products"),
-            orderBy(filter, itemFilter.order),
-            limit(10)
-          );
-    const snapshot = await getDocs(queryFilters);
-    const prods = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    console.log(prods);
-    return prods;
-  }
-  async function fetchFilteredProducts() {
-    let filter;
-    switch (itemFilter.criteria) {
-      case "Nuevos":
-        filter = "createdOn";
-        break;
-      case "Precio":
-        filter = "price";
-        break;
-      case "Mas comprados":
-        filter = "amountSelled";
-        break;
-      case "Valoracion":
-        filter = "rating";
+      case "Favoritos":
+        filter = "favorites";
         break;
     }
-
     let q;
-    if (itemFilter.criteria === "none" || !filter) {
-      q = query(
-        collection(db, "products"),
-        where("category", "==", idCat),
-        limit(10)
-      );
+    if (itemFilter.criteria === "none" || !filter || filter === "favorites") {
+      q = query(collection(db, "products"), limit(10));
+      if (idCat) {
+        q = query(
+          collection(db, "products"),
+          where("category", "==", idCat),
+          limit(10)
+        );
+      }
     } else {
       q = query(
         collection(db, "products"),
-        where("category", "==", idCat),
         orderBy(filter, itemFilter.order),
         limit(10)
       );
+      if (idCat) {
+        q = query(
+          collection(db, "products"),
+          where("category", "==", idCat),
+          orderBy(filter, itemFilter.order),
+          limit(10)
+        );
+      }
     }
-
     const querySnapshot = await getDocs(q);
-    let products = querySnapshot.docs.map((doc) => ({
+    let prods = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-
-    console.log(products);
-    return products;
+    if (filter === "favorites") {
+      const favoritesBatch = favorites.slice(startAt, startAt + 10);
+      console.log(favorites);
+      prods = prods.filter((product) => favoritesBatch.includes(product.code));
+    }
+    if (itemFilter.order === "desc" || filter !== "favorites") {
+      return prods;
+    } else {
+      return prods.reverse();
+    }
   }
   useEffect(() => {
-    if (!idCat) {
-      getAllProducts().then((products) => setProdList(products));
-    } else {
-      fetchFilteredProducts().then((products) => setProdList(products));
-    }
+    fetchProducts(idCat).then((products) => setProdList(products));
   }, [itemFilter, idCat]);
   return (
     <>
-      <Container data-bs-theme="dark" fluid className="themeTerciaryBgColor">
+      <Container fluid className="themeTerciaryBgColor">
         <Row className="justify-content-center text-center">
           <Col xs={12}>
             {idCat ? (
@@ -147,8 +145,8 @@ export default function ItemListContainer() {
               <h3
                 style={{
                   fontSize: "1.5rem",
-                  marginTop: "5px",
-                  marginBottom: "5px",
+                  marginTop: "15px",
+                  marginBottom: "15px",
                 }}
               >
                 Filtrando por: {itemFilter.criteria}
@@ -160,7 +158,7 @@ export default function ItemListContainer() {
           ) : null}
         </Row>
         <Row className="justify-content-center">
-          <ItemList productos={prodList} />
+          <ItemList productos={prodList} favorites={favorites} />
         </Row>
       </Container>
     </>

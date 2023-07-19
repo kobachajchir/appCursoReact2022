@@ -1,15 +1,26 @@
 import { useEffect } from "react";
 import "./../styles/ItemFilter.css";
 import { Col, Row } from "react-bootstrap";
+import { useMediaQuery } from "react-responsive";
 
 export default function ItemFilter(props) {
+  const isLg = useMediaQuery({ query: "(max-width: 992px)" });
   return (
     <Row
       className="d-flex flex-row align-items-center justify-content-center text-center filterControls themeTerciaryBgColor"
-      style={{ width: "100%" }}
-      data-bs-theme="dark"
+      style={{ marginBottom: isLg ? "80px" : 0 }}
     >
-      <Col xs={12} lg={2} className="d-flex flex-row justify-content-center">
+      <Col
+        xs={12}
+        lg={"auto"}
+        style={{
+          padding: 0,
+          paddingLeft: "15px",
+          paddingTop: isLg ? "10px" : 0,
+          marginBottom: isLg ? "-15px" : 0,
+        }}
+        className="d-flex flex-row justify-content-center"
+      >
         <input
           type="checkbox"
           id="enableFilters"
@@ -34,7 +45,8 @@ export default function ItemFilter(props) {
       </Col>
       <Col
         xs={12}
-        lg={6}
+        lg={"auto"}
+        style={{ padding: 0 }}
         className={`d-flex flex-row justify-content-center filterRadios${
           props.itemFilter.criteria === "none" ? " disabledFilters" : ""
         }`}
@@ -46,7 +58,6 @@ export default function ItemFilter(props) {
               id={filter}
               name="filter"
               value={filter}
-              data-bs-theme="dark"
               className="radioInputFilter"
               checked={props.itemFilter.criteria === filter}
               onChange={() => {
@@ -66,7 +77,6 @@ export default function ItemFilter(props) {
             />
             <label
               htmlFor={filter}
-              data-bs-theme="dark"
               disabled={props.itemFilter.criteria === "none"}
               className={`radioInputFilter filterButton themeEmphasisColor${
                 props.itemFilter.criteria === filter ? " activeFilter" : ""
@@ -81,11 +91,21 @@ export default function ItemFilter(props) {
           </div>
         ))}
       </Col>
-      <Col xs={12} lg={4}>
+      <Col xs={12} lg={"auto"} style={{ padding: 0 }}>
         <button
           className="changeFilterOrdenBtn"
           disabled={props.itemFilter.criteria === "none"}
-          data-bs-theme="dark"
+          style={
+            !isLg
+              ? {
+                  borderTopRightRadius: "15px",
+                  borderBottomRightRadius: "15px",
+                }
+              : {
+                  borderRadius: "15px",
+                  width: "100%",
+                }
+          }
           onClick={() => {
             props.setFilter({
               criteria: props.itemFilter.criteria,

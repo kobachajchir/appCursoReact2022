@@ -20,7 +20,10 @@ export default function CartItemActions({ product, quantity }) {
   };
   return (
     <>
-      <Col className="align-self-center" xs={"auto"}>
+      <Col
+        className="d-flex flex-row align-items-center justify-content-center"
+        xs={"auto"}
+      >
         <button
           className="quantityButton col-2 col-lg-auto"
           disabled={quantity < 2}
@@ -30,7 +33,7 @@ export default function CartItemActions({ product, quantity }) {
         </button>
         <span className="mx-2">{itemQuantity}</span>
         <button
-          className="quantityButton col-2 col-lg-auto"
+          className="quantityButton col-2 col-lg-auto "
           disabled={quantity >= product.stock}
           onClick={handlePlusOne}
         >

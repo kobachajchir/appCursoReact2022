@@ -6,8 +6,12 @@ function ToCartButton() {
   const navigate = useNavigate();
   const goToCart = () => navigate("/cart");
   return (
-    <Button variant="success" onClick={goToCart}>
-      <CartFill size={20} className="align-self-center" /> Ir al Carrito
+    <Button
+      variant="success"
+      onClick={goToCart}
+      className="d-flex justify-content-center align-items-center text-center"
+    >
+      Ir al Carrito
     </Button>
   );
 }

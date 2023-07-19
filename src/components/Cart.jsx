@@ -70,18 +70,9 @@ export default function Cart() {
           </Col>
           <div className="cartContainer">
             {cart.length > 0 ? (
-              <Row
-                className="justify-content-center"
-                style={{ backgroundColor: "#f5f5f5" }}
-              >
-                <Col
-                  xs={12}
-                  lg={4}
-                  className="text-center"
-                  style={{ backgroundColor: "#f5f5f5", marginLeft: "10px" }}
-                  disabled
-                >
-                  <h3 style={{ marginTop: "10px", marginBottom: "25px" }}>
+              <Row className="justify-content-center">
+                <Col xs={12} lg={4} className="text-center">
+                  <h3 style={{ marginTop: "10px", marginBottom: "10px" }}>
                     Resumen de compra
                   </h3>
                 </Col>
@@ -125,7 +116,11 @@ export default function Cart() {
                       lg={4}
                       className={`${!isLg ? "d-flex justify-content-end" : ""}`}
                     >
-                      <button className="btn btn-danger" onClick={clear}>
+                      <button
+                        className="btn btn-danger"
+                        onClick={clear}
+                        style={{ marginBottom: isLg ? "10px" : 0 }}
+                      >
                         Eliminar carrito
                       </button>
                     </Col>
@@ -144,18 +139,24 @@ export default function Cart() {
             ) : (
               <Row
                 className="justify-content-center"
-                style={{ marginTop: "25px", marginBottom: "25px" }}
+                style={{
+                  marginTop: "25px",
+                  marginBottom: "25px",
+                  backgroundColor: "var(--bs-secondary-bg)",
+                  borderRadius: "var(--bs-border-radius)",
+                  paddingTop: "15px",
+                  paddingBottom: "15px",
+                }}
               >
-                <Col
-                  xs={12}
-                  lg={7}
-                  className="text-center"
-                  style={{ backgroundColor: "#f5f5f5", padding: "100px" }}
-                >
+                <Col xs={12} lg={7} className="text-center">
                   <Cart2 size={100} />
+                </Col>
+                <Col xs={12} lg={7} className="text-center">
                   <h3 style={{ marginTop: "10px", marginBottom: "25px" }}>
                     No agregaste nada aun
                   </h3>
+                </Col>
+                <Col xs={12} lg={7} className="text-center">
                   <GoHomeButton />
                 </Col>
               </Row>
