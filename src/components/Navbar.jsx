@@ -135,6 +135,10 @@ export default function NavigationBar() {
                 </>
               ) : (
                 <>
+                  <NavDropdown.Item style={{ pointerEvents: "none" }}>
+                    Hola <strong>{userInfo.username}</strong>!
+                  </NavDropdown.Item>
+                  <NavDropdown.Divider />
                   <NavDropdown.Item as={Link} to={`/user`}>
                     Mi perfil
                   </NavDropdown.Item>

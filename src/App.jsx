@@ -134,7 +134,7 @@ function App() {
     }
   }, [fetchUserData, isUserLogged, userInfo.username]);
   useEffect(() => {
-    logIn("admintest@testing.com", "adminPassword");
+    logIn("usertest@testing.com", "userPassword");
   }, []);
   return !loading ? (
     <>

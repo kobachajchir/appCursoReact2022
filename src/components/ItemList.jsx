@@ -11,7 +11,7 @@ export default function ItemList({ productos, favorites }) {
           item={product}
           key={product.id}
           index={product.id}
-          isFavorite={favorites.includes(product.code)}
+          isFavorite={favorites && favorites.includes(product.code)}
         />
       ))}
     </>
