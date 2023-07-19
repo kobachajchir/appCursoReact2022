@@ -30,7 +30,6 @@ function ItemDetail(props) {
         date.getMonth(),
         date.getDate()
       );
-      console.log(convertedDate);
 
       setEndingDate(convertedDate.toLocaleDateString());
     }

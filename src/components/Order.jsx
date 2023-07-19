@@ -9,7 +9,6 @@ export default function Order() {
   const location = useLocation();
   const order = location.state;
   let formattedDate = new Date(order.date).toLocaleString().split(",")[0];
-  console.log("Order: ", order);
   useEffect(() => {}, []);
   return (
     <>

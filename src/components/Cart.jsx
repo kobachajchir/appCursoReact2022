@@ -31,11 +31,8 @@ export default function Cart() {
     totalWithDiscount,
   } = useContext(CartContext);
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
-  useEffect(() => {
-    console.log(cart);
-  }, []);
+  useEffect(() => {}, []);
   function createOrder() {
-    console.log("Creando orden");
     let orderId;
     const orderDetails = buyCart();
     const items = orderDetails.items;
@@ -58,7 +55,6 @@ export default function Cart() {
       date: new Date().toDateString(),
       total: total,
     };
-    console.log("Order: ", order);
     navigate(`/order/1000`, { state: { ...order, id: "test123" } });
   }
   return (

@@ -14,7 +14,6 @@ export default function FavoriteHeart(props) {
     } else {
       updatedFavorites = [...favorites, props.productCode];
     }
-    console.log(updatedFavorites);
     setUserFavorites(updatedFavorites);
   }
 

@@ -58,7 +58,6 @@ export function ItemCount({ product, isOnSale, sale }) {
               <a
                 className="btn btn-danger addToCart"
                 onClick={() => {
-                  console.log("ADD TO CART " + product.code);
                   addItem(product, quantity, isOnSale, sale);
                   setAddedToCart(true);
                 }}

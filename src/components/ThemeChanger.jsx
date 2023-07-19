@@ -7,7 +7,7 @@ import { useMediaQuery } from "react-responsive";
 export default function ThemeChanger(props) {
   const {
     isDarkTheme: isDarkTheme,
-    setUserInfo: setUserInfo,
+    setUserTheme: setUserTheme,
     userInfo: userInfo,
   } = useContext(GeneralCompany);
   const shouldRenderChild = useDelayUnmount(isDarkTheme, 500);
@@ -18,7 +18,7 @@ export default function ThemeChanger(props) {
   };
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
   const handleToggleClicked = () => {
-    setUserInfo({ ...userInfo, userDarkMode: !isDarkTheme });
+    setUserTheme(!isDarkTheme);
   };
   return (
     <>

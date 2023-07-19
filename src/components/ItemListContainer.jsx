@@ -108,7 +108,6 @@ export default function ItemListContainer() {
     }));
     if (filter === "favorites") {
       const favoritesBatch = favorites.slice(startAt, startAt + 10);
-      console.log(favorites);
       prods = prods.filter((product) => favoritesBatch.includes(product.code));
     }
     if (itemFilter.order === "desc" || filter !== "favorites") {

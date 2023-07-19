@@ -11,9 +11,7 @@ export default function CartItem({ product, quantity, sale = null }) {
   const salePrice = hasSale
     ? product.price - (sale.discountPercentage * product.price) / 100
     : product.price;
-  useEffect(() => {
-    console.log(sale);
-  });
+  useEffect(() => {});
   return (
     <>
       <Col xs="auto" className="align-self-center">

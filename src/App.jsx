@@ -21,8 +21,11 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import AboutUs from "./components/AboutUs";
 import FavoritesListContainer from "./components/FavoritesListContainer";
+import Contact from "./components/Contact";
+import AdminPage from "./components/AdminPage";
 export const GeneralCompany = createContext();
 const firebaseConfig = {
   apiKey: "AIzaSyClyM0t39WQ8SI37pIZycGy2o02d57byxs",
@@ -36,15 +39,17 @@ initializeApp(firebaseConfig);
 
 function App() {
   const db = getFirestore();
+  const username = "kobachajchir";
+  const genericUserData = {
+    username: "notLogged",
+    prefersDarkMode: true,
+    status: "user",
+  };
   const [navCat, setNavCat] = useState([]);
   const [loading, setLoading] = useState(true);
   const [companyInfo, setCompanyInfo] = useState();
-  const [userInfo, setUserInfo] = useState({
-    userDarkMode: true,
-    isUserLogged: true,
-    username: "kobachajchir",
-  });
-  const [favorites, setFavorites] = useState([]);
+  const [userInfo, setUserInfo] = useState(genericUserData);
+  const [isUserLogged, setUserLogged] = useState(false);
   const fetchCompanyInfo = async () => {
     const db = getFirestore();
     const data = await getDocs(collection(db, "companyInfo"));
@@ -56,22 +61,53 @@ function App() {
     const db = getFirestore();
     const data = await getDocs(collection(db, "categories"));
     const results = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-    console.log(results);
     return results;
   };
-  async function fetchFavorites(username) {
+  const fetchUserData = useCallback(async (userEmail) => {
     const q = query(
       collection(db, "users"),
-      where("username", "==", userInfo.username)
+      where("userEmail", "==", userEmail)
     );
     const querySnapshot = await getDocs(q);
-    let favorites;
+    let userData;
     querySnapshot.forEach((doc) => {
-      favorites = doc.data().favorites;
-      console.log(doc.id, " => ", doc.data());
+      userData = doc.data();
     });
-    return favorites;
+    return userData;
+  }, []);
+  function updateUserTheme(isDarkTheme) {
+    setUserInfo((userInfo) => ({ ...userInfo, prefersDarkMode: isDarkTheme }));
   }
+  function updateUserFavorites(favorites) {
+    setUserInfo((userInfo) => ({ ...userInfo, favorites: favorites }));
+  }
+  function logOut() {
+    setUserInfo(genericUserData);
+    setUserLogged(false);
+  }
+  const logIn = useCallback(
+    (email, password) => {
+      const auth = getAuth();
+      signInWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
+          console.log(userCredential);
+          const userData = await fetchUserData(email);
+          if (userData) {
+            setUserInfo(userData);
+            setUserLogged(true);
+          } else {
+            setUserInfo(undefined);
+            setUserLogged(false);
+          }
+        })
+        .catch((error) => {
+          console.error(`Error ${error.code}: ${error.message}`);
+          setUserInfo(genericUserData);
+          setUserLogged(false);
+        });
+    },
+    [fetchUserData]
+  );
   useEffect(() => {
     Promise.all([fetchCompanyInfo(), fetchCategories()])
       .then(([info, cats]) => {
@@ -85,35 +121,37 @@ function App() {
       });
   }, []);
   useEffect(() => {
+    console.log(userInfo);
     const htmlElement = document.getElementById("htmlElement");
     htmlElement.setAttribute(
       "data-bs-theme",
-      !userInfo.userDarkMode ? "light" : "dark"
+      !userInfo.prefersDarkMode ? "light" : "dark"
     );
-  }, [userInfo.userDarkMode]);
-  const fetchFavoritesCallback = useCallback(async () => {
-    if (userInfo.isUserLogged) {
-      setFavorites(await fetchFavorites(userInfo.username));
-    } else {
-      setFavorites([]);
-    }
-  }, [userInfo.username, userInfo.isUserLogged]);
+  }, [userInfo]);
   useEffect(() => {
-    fetchFavoritesCallback();
-  }, [fetchFavoritesCallback, userInfo.isUserLogged]);
+    if (isUserLogged) {
+      fetchUserData(userInfo.username);
+    }
+  }, [fetchUserData, isUserLogged, userInfo.username]);
+  useEffect(() => {
+    logIn("admintest@testing.com", "adminPassword");
+  }, []);
   return !loading ? (
     <>
       <GeneralCompany.Provider
         value={{
           companyInfo: companyInfo,
           productCategories: navCat,
-          isDarkTheme: userInfo.userDarkMode,
-          isUserLogged: userInfo.isUserLogged,
+          isDarkTheme: userInfo.prefersDarkMode,
+          isUserAdmin: userInfo.status === "admin" ? true : false,
+          isUserLogged: isUserLogged,
           username: userInfo.username,
-          userFavorites: favorites,
+          userFavorites: userInfo.favorites,
           userInfo: userInfo,
-          setUserFavorites: setFavorites,
-          setUserInfo: setUserInfo,
+          setUserFavorites: updateUserFavorites,
+          setUserTheme: updateUserTheme,
+          logIn: logIn,
+          logOut: logOut,
         }}
       >
         <CartProvider>
@@ -122,6 +160,10 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route exact path="/aboutUs" element={<AboutUs />} />
+              <Route exact path="/contact" element={<Contact />} />
+              {userInfo.status === "admin" && (
+                <Route exact path="/adminPage" element={<AdminPage />} />
+              )}
               <Route exact path="/cart" element={<Cart />} />
               <Route
                 exact

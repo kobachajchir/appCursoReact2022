@@ -4,7 +4,12 @@ import { Container, Nav, Navbar, NavDropdown, NavItem } from "react-bootstrap";
 import { collection, getDocs, getFirestore } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import { GeneralCompany } from "../App";
-import { CartFill, MoonFill, PersonCircle } from "react-bootstrap-icons";
+import {
+  Building,
+  CartFill,
+  MoonFill,
+  PersonCircle,
+} from "react-bootstrap-icons";
 import { useMediaQuery } from "react-responsive";
 import { CartContext } from "../context/CartContext";
 import ThemeChanger from "./ThemeChanger";
@@ -15,6 +20,7 @@ export default function NavigationBar() {
     productCategories: categories,
     isUserLogged: isUserLogged,
     userInfo: userInfo,
+    isUserAdmin: isUserAdmin,
     setUserInfo: setUserInfo,
   } = useContext(GeneralCompany);
   const [navbarBrand, setNavbarBrand] = useState(compInfo.companyName);
@@ -98,8 +104,20 @@ export default function NavigationBar() {
                 Todos los productos
               </NavDropdown.Item>
             </NavDropdown>
+            <Nav.Link as={Link} to={`contact/`}>
+              Contacto
+            </Nav.Link>
           </Nav>
           <Nav>
+            {isUserAdmin && (
+              <Nav.Link
+                as={Link}
+                to={"/adminPage"}
+                className="d-flex align-items-center"
+              >
+                {!isLg ? <Building /> : "Administracion"}
+              </Nav.Link>
+            )}
             <NavDropdown
               title={!isLg ? <PersonCircle /> : "Usuario"}
               id="collasible-nav-dropdown"

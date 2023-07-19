@@ -9,9 +9,7 @@ export function ProductCountButton(props) {
   const handlePlusOne = () => {
     props.quantity < props.stock && props.setQuantity(props.quantity + 1);
   };
-  useEffect(() => {
-    console.log(props);
-  }, []);
+  useEffect(() => {}, []);
   return (
     <button
       className={

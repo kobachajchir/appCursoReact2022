@@ -48,8 +48,6 @@ export default function CartProvider({ children }) {
 
   function isInCart(itemId) {
     let result = cart.some((cartItem) => cartItem.item.id === itemId);
-    console.log(result);
-    console.log(itemId);
     return result;
   }
 
@@ -99,7 +97,6 @@ export default function CartProvider({ children }) {
   useEffect(() => {
     calculateTotal();
     calculateQuantity();
-    console.log(cart);
   }, [cart]);
 
   return (
