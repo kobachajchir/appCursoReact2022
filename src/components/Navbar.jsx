@@ -14,11 +14,19 @@ export default function NavigationBar() {
     companyInfo: compInfo,
     productCategories: categories,
     isUserLogged: isUserLogged,
+    userInfo: userInfo,
+    setUserInfo: setUserInfo,
   } = useContext(GeneralCompany);
   const [navbarBrand, setNavbarBrand] = useState(compInfo.companyName);
   const { quantity, totalWithDiscount } = useContext(CartContext);
   useEffect(() => setNavbarBrand(compInfo.companyName), [compInfo]);
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
+  function logOut() {
+    setUserInfo({ ...userInfo, isUserLogged: false });
+  }
+  function logIn() {
+    setUserInfo({ ...userInfo, isUserLogged: true });
+  }
   return (
     <Navbar
       collapseOnSelect
@@ -99,7 +107,11 @@ export default function NavigationBar() {
             >
               {!isUserLogged ? (
                 <>
-                  <NavDropdown.Item as={Link} to={`/user/login`}>
+                  <NavDropdown.Item
+                    as={Link}
+                    to={`/user/login`}
+                    onClick={logIn}
+                  >
                     Iniciar sesion
                   </NavDropdown.Item>
                 </>
@@ -118,7 +130,7 @@ export default function NavigationBar() {
                     Configuracion
                   </NavDropdown.Item>
                   <NavDropdown.Divider />
-                  <NavDropdown.Item as={Link} to={`/user/logout`}>
+                  <NavDropdown.Item as={Link} onClick={logOut}>
                     Cerrar sesion
                   </NavDropdown.Item>
                 </>
