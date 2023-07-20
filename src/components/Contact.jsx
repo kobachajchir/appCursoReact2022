@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { Button, Col, Container, Row } from "react-bootstrap";
+import { Button, Container, Col, Row, InputGroup, Form } from "react-bootstrap";
+import contactUsBanner from "../assets/images/contact-us-banner.jpg";
 import { GeneralCompany } from "../App";
 import {
   Facebook,
@@ -8,12 +9,16 @@ import {
   Twitter,
   Whatsapp,
 } from "react-bootstrap-icons";
+import ContactForm from "./ContactForm";
 
 export default function Contact() {
   const { companyInfo: compInfo } = useContext(GeneralCompany);
   const [companyContactInfo, setCompanyContactInfo] = useState(
     compInfo.companyContactInfo
   );
+  function sendFormEvent(form) {
+    console.log(form);
+  }
   function handleContactButton(evt) {
     const key = evt.target.getAttribute("data-key");
     const value = evt.target.getAttribute("data-value");
@@ -35,13 +40,38 @@ export default function Contact() {
   useEffect(() => console.log(companyContactInfo));
   return (
     <Container>
+      <Row>
+        <Col xs={12}>
+          <img
+            src={contactUsBanner}
+            alt="Contact us Banner"
+            style={{
+              overflow: "hidden",
+              objectFit: "contain",
+              maxWidth: "100%",
+            }}
+          />
+        </Col>
+      </Row>
       <Row
         className="d-flex align-items-center justify-content-center text-center"
         style={{ marginTop: "15px" }}
       >
-        <Col xs={12} lg={8} as={Row}>
-          <Col>
+        <Col
+          xs={12}
+          lg={8}
+          as={Row}
+          className="d-flex align-items-center justify-content-center text-center"
+          style={{
+            backgroundColor: "var(--bs-dark-bg-subtle)",
+            borderRadius: "var(--bs-border-radius)",
+          }}
+        >
+          <Col xs={10}>
             <h1>Contactanos</h1>
+          </Col>
+          <Col xs={10}>
+            <ContactForm sendForm={sendFormEvent} />
           </Col>
         </Col>
         <Col

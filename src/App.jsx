@@ -1,7 +1,7 @@
 import { createContext, useCallback, useEffect, useState } from "react";
 import "./App.css";
 import Navigationbar from "./components/Navbar";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import { Container } from "react-bootstrap";
 import ItemListContainer from "./components/ItemListContainer";
 import ItemDetailContainer from "./components/ItemDetailContainer";
@@ -26,6 +26,7 @@ import AboutUs from "./components/AboutUs";
 import FavoritesListContainer from "./components/FavoritesListContainer";
 import Contact from "./components/Contact";
 import AdminPage from "./components/AdminPage";
+import LoginPage from "./components/LoginPage";
 export const GeneralCompany = createContext();
 const firebaseConfig = {
   apiKey: "AIzaSyClyM0t39WQ8SI37pIZycGy2o02d57byxs",
@@ -50,6 +51,20 @@ function App() {
   const [companyInfo, setCompanyInfo] = useState();
   const [userInfo, setUserInfo] = useState(genericUserData);
   const [isUserLogged, setUserLogged] = useState(false);
+  const navigate = useNavigate();
+
+  const goToHome = () => {
+    navigate("/");
+  };
+  const NotLoginRedirect = () => {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+      navigate("/login");
+    }, [navigate]);
+
+    return null;
+  };
   const fetchCompanyInfo = async () => {
     const db = getFirestore();
     const data = await getDocs(collection(db, "companyInfo"));
@@ -95,6 +110,7 @@ function App() {
           if (userData) {
             setUserInfo(userData);
             setUserLogged(true);
+            goToHome();
           } else {
             setUserInfo(undefined);
             setUserLogged(false);
@@ -133,9 +149,7 @@ function App() {
       fetchUserData(userInfo.username);
     }
   }, [fetchUserData, isUserLogged, userInfo.username]);
-  useEffect(() => {
-    logIn("usertest@testing.com", "userPassword");
-  }, []);
+  useEffect(() => {}, []);
   return !loading ? (
     <>
       <GeneralCompany.Provider
@@ -155,41 +169,48 @@ function App() {
         }}
       >
         <CartProvider>
-          <BrowserRouter>
-            <Navigationbar />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route exact path="/aboutUs" element={<AboutUs />} />
-              <Route exact path="/contact" element={<Contact />} />
-              {userInfo.status === "admin" && (
-                <Route exact path="/adminPage" element={<AdminPage />} />
-              )}
-              <Route exact path="/cart" element={<Cart />} />
-              <Route
-                exact
-                path="/category/:idCat"
-                element={<ItemListContainer />}
-              />
-              <Route exact path="/category/" element={<ItemListContainer />} />
-
-              <Route
-                exact
-                path="/product/:idProd"
-                element={<ItemDetailContainer />}
-              />
-              <Route exact path="/order/:idOrder" element={<Order />} />
-              <Route exact path="/orders" element={<OrdersContainer />} />
-              <Route exact path="/user/" element={<User />} />
-              <Route
-                exact
-                path="/user/favorites"
-                element={<FavoritesListContainer />}
-              />
-              <Route exact path="/user/myOrders" element={<User />} />
-              <Route exact path="/user/settings" element={<User />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+          {isUserLogged && <Navigationbar />}
+          <Routes>
+            <Route exact path="/login" element={<LoginPage logIn={logIn} />} />
+            <Route path="*" element={<NotLoginRedirect />} />
+            {isUserLogged && (
+              <>
+                <Route path="/" element={<Home />} />
+                <Route exact path="/aboutUs" element={<AboutUs />} />
+                <Route exact path="/contact" element={<Contact />} />
+                {userInfo.status === "admin" && (
+                  <Route exact path="/adminPage" element={<AdminPage />} />
+                )}
+                <Route exact path="/cart" element={<Cart />} />
+                <Route
+                  exact
+                  path="/category/:idCat"
+                  element={<ItemListContainer />}
+                />
+                <Route
+                  exact
+                  path="/category/"
+                  element={<ItemListContainer />}
+                />
+                <Route
+                  exact
+                  path="/product/:idProd"
+                  element={<ItemDetailContainer />}
+                />
+                <Route exact path="/order/:idOrder" element={<Order />} />
+                <Route exact path="/orders" element={<OrdersContainer />} />
+                <Route exact path="/user/" element={<User />} />
+                <Route
+                  exact
+                  path="/user/favorites"
+                  element={<FavoritesListContainer />}
+                />
+                <Route exact path="/user/myOrders" element={<User />} />
+                <Route exact path="/user/settings" element={<User />} />{" "}
+                <Route path="*" element={<NotFound />} />
+              </>
+            )}
+          </Routes>
         </CartProvider>
       </GeneralCompany.Provider>
     </>
