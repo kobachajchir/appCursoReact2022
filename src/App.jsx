@@ -21,12 +21,13 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import AboutUs from "./components/AboutUs";
 import FavoritesListContainer from "./components/FavoritesListContainer";
 import Contact from "./components/Contact";
 import AdminPage from "./components/AdminPage";
 import LoginPage from "./components/LoginPage";
+import Footer from "./components/Footer";
 export const GeneralCompany = createContext();
 const firebaseConfig = {
   apiKey: "AIzaSyClyM0t39WQ8SI37pIZycGy2o02d57byxs",
@@ -51,6 +52,14 @@ function App() {
   const [companyInfo, setCompanyInfo] = useState();
   const [userInfo, setUserInfo] = useState(genericUserData);
   const [isUserLogged, setUserLogged] = useState(false);
+  const [error, setError] = useState(undefined);
+  const [developerData, setDeveloperData] = useState();
+
+  const handleLoginError = (error) => {
+    console.log(error);
+    setError(error);
+  };
+
   const navigate = useNavigate();
 
   const goToHome = () => {
@@ -65,15 +74,22 @@ function App() {
 
     return null;
   };
+  const fetchDeveloperData = async () => {
+    const data = await getDocs(collection(db, "developerData"));
+    const results = data.docs.map((doc) => ({ ...doc.data() }));
+    const objRes = Object.entries(results[0]).map(([key, value]) => {
+      return { key, value };
+    });
+    console.log(objRes);
+    return objRes;
+  };
   const fetchCompanyInfo = async () => {
-    const db = getFirestore();
     const data = await getDocs(collection(db, "companyInfo"));
     const results = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
     console.log(results);
     return results;
   };
   const fetchCategories = async () => {
-    const db = getFirestore();
     const data = await getDocs(collection(db, "categories"));
     const results = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
     return results;
@@ -97,6 +113,13 @@ function App() {
     setUserInfo((userInfo) => ({ ...userInfo, favorites: favorites }));
   }
   function logOut() {
+    signOut(auth)
+      .then(() => {
+        // Sign-out successful.
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     setUserInfo(genericUserData);
     setUserLogged(false);
   }
@@ -117,7 +140,7 @@ function App() {
           }
         })
         .catch((error) => {
-          console.error(`Error ${error.code}: ${error.message}`);
+          handleLoginError(error);
           setUserInfo(genericUserData);
           setUserLogged(false);
         });
@@ -125,17 +148,21 @@ function App() {
     [fetchUserData]
   );
   useEffect(() => {
-    Promise.all([fetchCompanyInfo(), fetchCategories()])
-      .then(([info, cats]) => {
-        setCompanyInfo(info[0]);
-        setNavCat(cats);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        // You might also want to set an error state here to display an error message
-      });
-  }, []);
+    if (isUserLogged) {
+      console.log(isUserLogged);
+      Promise.all([fetchCompanyInfo(), fetchCategories(), fetchDeveloperData()])
+        .then(([info, cats, devData]) => {
+          setCompanyInfo(info[0]);
+          setNavCat(cats);
+          setDeveloperData(devData);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+          // You might also want to set an error state here to display an error message
+        });
+    }
+  }, [isUserLogged]);
   useEffect(() => {
     console.log(userInfo);
     const htmlElement = document.getElementById("htmlElement");
@@ -150,7 +177,7 @@ function App() {
     }
   }, [fetchUserData, isUserLogged, userInfo.username]);
   useEffect(() => {}, []);
-  return !loading ? (
+  return (
     <>
       <GeneralCompany.Provider
         value={{
@@ -162,6 +189,7 @@ function App() {
           username: userInfo.username,
           userFavorites: userInfo.favorites,
           userInfo: userInfo,
+          devData: developerData,
           setUserFavorites: updateUserFavorites,
           setUserTheme: updateUserTheme,
           logIn: logIn,
@@ -169,52 +197,50 @@ function App() {
         }}
       >
         <CartProvider>
-          {isUserLogged && <Navigationbar />}
+          {isUserLogged && !loading && <Navigationbar />}
           <Routes>
-            <Route exact path="/login" element={<LoginPage logIn={logIn} />} />
-            <Route path="*" element={<NotLoginRedirect />} />
-            {isUserLogged && (
+            <Route
+              path="/login"
+              element={<LoginPage logIn={logIn} error={error} />}
+            />
+            {!isUserLogged ? (
+              <Route path="*" element={<NotLoginRedirect />} />
+            ) : (
               <>
                 <Route path="/" element={<Home />} />
-                <Route exact path="/aboutUs" element={<AboutUs />} />
-                <Route exact path="/contact" element={<Contact />} />
+                <Route path="/aboutUs" element={<AboutUs />} />
+                <Route path="/contact" element={<Contact />} />
                 {userInfo.status === "admin" && (
-                  <Route exact path="/adminPage" element={<AdminPage />} />
+                  <Route path="/adminPage" element={<AdminPage />} />
                 )}
-                <Route exact path="/cart" element={<Cart />} />
+                <Route path="/cart" element={<Cart />} />
                 <Route
-                  exact
                   path="/category/:idCat"
                   element={<ItemListContainer />}
                 />
+                <Route path="/category/" element={<ItemListContainer />} />
                 <Route
-                  exact
-                  path="/category/"
-                  element={<ItemListContainer />}
-                />
-                <Route
-                  exact
                   path="/product/:idProd"
                   element={<ItemDetailContainer />}
                 />
-                <Route exact path="/order/:idOrder" element={<Order />} />
-                <Route exact path="/orders" element={<OrdersContainer />} />
-                <Route exact path="/user/" element={<User />} />
+                <Route path="/order/:idOrder" element={<Order />} />
+                <Route path="/orders" element={<OrdersContainer />} />
+                <Route path="/user/" element={<User />} />
                 <Route
-                  exact
                   path="/user/favorites"
                   element={<FavoritesListContainer />}
                 />
-                <Route exact path="/user/myOrders" element={<User />} />
-                <Route exact path="/user/settings" element={<User />} />{" "}
+                <Route path="/user/myOrders" element={<User />} />
+                <Route path="/user/settings" element={<User />} />
                 <Route path="*" element={<NotFound />} />
               </>
             )}
           </Routes>
+          {isUserLogged && !loading && <Footer />}
         </CartProvider>
       </GeneralCompany.Provider>
     </>
-  ) : null; //Agregar spinner de carga aca
+  );
 }
 
 export default App;

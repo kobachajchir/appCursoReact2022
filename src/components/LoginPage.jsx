@@ -1,6 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import { Google, Github, Facebook } from "react-bootstrap-icons";
+import {
+  Google,
+  Github,
+  Facebook,
+  Star,
+  XOctagonFill,
+} from "react-bootstrap-icons";
+import LoginErrorBanner from "./LoginErrorBanner";
 
 function LoginPage(props) {
   const [email, setEmail] = useState("");
@@ -9,6 +16,9 @@ function LoginPage(props) {
   const [isHoverFacebook, setIsHoverFacebook] = useState(false);
   const [isHoverGithub, setIsHoverGithub] = useState(false);
   const [bgColor, setBgColor] = useState("#000");
+  const [wrongPass, setWrongPass] = useState(false);
+  const [noUser, setNoUser] = useState(false);
+  const [tooManyAttempts, setTooManyAttempts] = useState(false);
 
   const handleMouseEnter = (evt) => {
     setBgColor(evt.target.getAttribute("data-bgcolor"));
@@ -41,8 +51,7 @@ function LoginPage(props) {
   };
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  const handleLogin = () => {
+  async function handleLogin() {
     if (!emailRegex.test(email)) {
       alert("Please enter a valid email address");
       return;
@@ -53,8 +62,8 @@ function LoginPage(props) {
       return;
     }
 
-    props.logIn(email, password);
-  };
+    await props.logIn(email, password);
+  }
   const inputStyles = {
     color: "var(--bs-body-color)",
     backgroundColor: "var(--bs-secondary-bg)",
@@ -80,7 +89,29 @@ function LoginPage(props) {
     height: "50px",
     width: "50px",
   };
-
+  function reset() {
+    setEmail("");
+    setPassword("");
+  }
+  useEffect(() => {
+    if (props.error) {
+      console.log(props.error.code);
+      if (props.error.code === "auth/user-not-found") {
+        setNoUser(true);
+        setWrongPass(false);
+        setTooManyAttempts(false);
+      } else if (props.error.code === "auth/wrong-password") {
+        setWrongPass(true);
+        setNoUser(false);
+        setTooManyAttempts(false);
+      } else if (props.error.code === "auth/too-many-requests") {
+        setNoUser(false);
+        setWrongPass(false);
+        setTooManyAttempts(true);
+      }
+      reset();
+    }
+  }, [props.error]);
   return (
     <Container
       className="d-flex align-items-center justify-content-center flex-column text-center"
@@ -101,7 +132,7 @@ function LoginPage(props) {
           <Row className="d-flex align-items-center justify-content-center text-center">
             <Col xs={12} as={Row}>
               <Col xs={12}>
-                <h2>Ingreso</h2>
+                <h2>Bienvenido</h2>
               </Col>
               <Col xs={12}>
                 <label
@@ -114,6 +145,13 @@ function LoginPage(props) {
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onClick={() => {
+                    if (wrongPass || noUser) {
+                      setWrongPass(false);
+                      setNoUser(false);
+                      setTooManyAttempts(false);
+                    }
+                  }}
                   type="email"
                   style={inputStyles}
                 />
@@ -129,6 +167,13 @@ function LoginPage(props) {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onClick={() => {
+                    if (wrongPass || noUser) {
+                      setWrongPass(false);
+                      setNoUser(false);
+                      setTooManyAttempts(false);
+                    }
+                  }}
                   type="password"
                   style={inputStyles}
                 />
@@ -215,6 +260,28 @@ function LoginPage(props) {
           </Row>
         </Col>
       </Row>
+      {noUser && (
+        <LoginErrorBanner>
+          <p>No se encontro usuario</p>
+        </LoginErrorBanner>
+      )}
+      {wrongPass && (
+        <LoginErrorBanner>
+          <p>Contraseña incorrecta</p>
+        </LoginErrorBanner>
+      )}
+      {tooManyAttempts && (
+        <LoginErrorBanner>
+          <p style={{ margin: 0 }}>Demasiados intentos incorrectos</p>
+          <p style={{ margin: 0 }}>
+            Debes cambiar la contraseña, haz click para enviar el correo de
+            restablecimiento
+          </p>
+          <Col xs={12} style={{ marginTop: "10px" }}>
+            <Button variant="secondary">Restablecer contraseña</Button>
+          </Col>
+        </LoginErrorBanner>
+      )}
     </Container>
   );
 }

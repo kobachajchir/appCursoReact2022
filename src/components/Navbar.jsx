@@ -75,13 +75,11 @@ export default function NavigationBar() {
             </Nav.Link>
             <NavDropdown title="Categorias" id="collasible-nav-dropdown">
               {categories.map((category, index) => (
-                <>
+                <div key={category + index}>
                   {category.subcategories ? (
                     <>
                       <NavDropdown.Divider />
-                      <NavDropdown.Header key={category + index}>
-                        {category.name}
-                      </NavDropdown.Header>
+                      <NavDropdown.Header>{category.name}</NavDropdown.Header>
                       {category.subcategories.map((subcategory, index) => (
                         <NavDropdown.Item
                           as={Link}
@@ -97,7 +95,7 @@ export default function NavigationBar() {
                       {category.name}
                     </NavDropdown.Item>
                   )}
-                </>
+                </div>
               ))}
               <NavDropdown.Divider />
               <NavDropdown.Item as={Link} to={`category/`}>
