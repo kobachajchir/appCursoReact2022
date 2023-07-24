@@ -65,6 +65,15 @@ function App() {
   const goToHome = () => {
     navigate("/");
   };
+  const LoginRedirect = () => {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+      navigate("/");
+    }, [navigate]);
+
+    return null;
+  };
   const NotLoginRedirect = () => {
     const navigate = useNavigate();
 
@@ -86,8 +95,8 @@ function App() {
   const fetchCompanyInfo = async () => {
     const data = await getDocs(collection(db, "companyInfo"));
     const results = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-    console.log(results);
-    return results;
+    console.log(results[0]);
+    return results[0];
   };
   const fetchCategories = async () => {
     const data = await getDocs(collection(db, "categories"));
@@ -111,6 +120,9 @@ function App() {
   }
   function updateUserFavorites(favorites) {
     setUserInfo((userInfo) => ({ ...userInfo, favorites: favorites }));
+  }
+  function updateCompData(info) {
+    setCompanyInfo(info);
   }
   function logOut() {
     signOut(auth)
@@ -152,7 +164,7 @@ function App() {
       console.log(isUserLogged);
       Promise.all([fetchCompanyInfo(), fetchCategories(), fetchDeveloperData()])
         .then(([info, cats, devData]) => {
-          setCompanyInfo(info[0]);
+          setCompanyInfo(info);
           setNavCat(cats);
           setDeveloperData(devData);
           setLoading(false);
@@ -175,6 +187,7 @@ function App() {
     if (isUserLogged) {
       fetchUserData(userInfo.username);
     }
+    console.log(navCat);
   }, [fetchUserData, isUserLogged, userInfo.username]);
   useEffect(() => {}, []);
   return (
@@ -190,6 +203,7 @@ function App() {
           userFavorites: userInfo.favorites,
           userInfo: userInfo,
           devData: developerData,
+          setCompData: updateCompData,
           setUserFavorites: updateUserFavorites,
           setUserTheme: updateUserTheme,
           logIn: logIn,
@@ -198,44 +212,49 @@ function App() {
       >
         <CartProvider>
           {isUserLogged && !loading && <Navigationbar />}
-          <Routes>
-            <Route
-              path="/login"
-              element={<LoginPage logIn={logIn} error={error} />}
-            />
-            {!isUserLogged ? (
-              <Route path="*" element={<NotLoginRedirect />} />
-            ) : (
-              <>
-                <Route path="/" element={<Home />} />
-                <Route path="/aboutUs" element={<AboutUs />} />
-                <Route path="/contact" element={<Contact />} />
-                {userInfo.status === "admin" && (
-                  <Route path="/adminPage" element={<AdminPage />} />
-                )}
-                <Route path="/cart" element={<Cart />} />
-                <Route
-                  path="/category/:idCat"
-                  element={<ItemListContainer />}
-                />
-                <Route path="/category/" element={<ItemListContainer />} />
-                <Route
-                  path="/product/:idProd"
-                  element={<ItemDetailContainer />}
-                />
-                <Route path="/order/:idOrder" element={<Order />} />
-                <Route path="/orders" element={<OrdersContainer />} />
-                <Route path="/user/" element={<User />} />
-                <Route
-                  path="/user/favorites"
-                  element={<FavoritesListContainer />}
-                />
-                <Route path="/user/myOrders" element={<User />} />
-                <Route path="/user/settings" element={<User />} />
-                <Route path="*" element={<NotFound />} />
-              </>
-            )}
-          </Routes>
+          <div id="routerComponentOutlet" style={{ minHeight: "90vh" }}>
+            <Routes>
+              {!isUserLogged ? (
+                <>
+                  <Route
+                    path="/login"
+                    element={<LoginPage logIn={logIn} error={error} />}
+                  />
+                  <Route path="*" element={<NotLoginRedirect />} />
+                </>
+              ) : (
+                <>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/login" element={<LoginRedirect />} />
+                  <Route path="/aboutUs" element={<AboutUs />} />
+                  <Route path="/contact" element={<Contact />} />
+                  {userInfo.status === "admin" && (
+                    <Route path="/adminPage" element={<AdminPage />} />
+                  )}
+                  <Route path="/cart" element={<Cart />} />
+                  <Route
+                    path="/category/:idCat"
+                    element={<ItemListContainer />}
+                  />
+                  <Route path="/category/" element={<ItemListContainer />} />
+                  <Route
+                    path="/product/:idProd"
+                    element={<ItemDetailContainer />}
+                  />
+                  <Route path="/order/:idOrder" element={<Order />} />
+                  <Route path="/orders" element={<OrdersContainer />} />
+                  <Route path="/user/" element={<User />} />
+                  <Route
+                    path="/user/favorites"
+                    element={<FavoritesListContainer />}
+                  />
+                  <Route path="/user/myOrders" element={<User />} />
+                  <Route path="/user/settings" element={<User />} />
+                  <Route path="*" element={<NotFound />} />
+                </>
+              )}
+            </Routes>
+          </div>
           {isUserLogged && !loading && <Footer />}
         </CartProvider>
       </GeneralCompany.Provider>

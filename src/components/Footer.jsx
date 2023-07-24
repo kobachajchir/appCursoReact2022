@@ -48,6 +48,7 @@ function Footer() {
               const IconComponent = icons[key];
               return (
                 <Button
+                  key={"devContactButton" + key}
                   variant="link"
                   style={styles}
                   onClick={handleContactButton}

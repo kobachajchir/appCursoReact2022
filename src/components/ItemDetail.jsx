@@ -3,13 +3,18 @@ import "./../styles/ItemDetail.css";
 import ToCartButton from "./ToCartButton";
 import { Col, Row, Carousel, Container } from "react-bootstrap";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import CarouselWithThumbnails from "./CarouselWithThumbnails";
 import { useMediaQuery } from "react-responsive";
+import { StarFill } from "react-bootstrap-icons";
+import FavoriteHeart from "./FavoriteHeart";
+import { GeneralCompany } from "../App";
 
 function ItemDetail(props) {
   const [item, setItem] = useState(props.item);
   const [isOnSale, setIsOnSale] = useState(props.sale.isOnSale);
+  const { userFavorites: favorites } = useContext(GeneralCompany);
+  const isFavorite = favorites.includes(props.item.code);
   const [saleObject, setSaleObject] = useState({});
   const [salePrice, setSalePrice] = useState("");
   const [endingDate, setEndingDate] = useState("");
@@ -34,7 +39,6 @@ function ItemDetail(props) {
       setEndingDate(convertedDate.toLocaleDateString());
     }
   }, [props.sale.isOnSale]);
-
   return (
     <Container>
       <Row
@@ -78,7 +82,46 @@ function ItemDetail(props) {
             <h5 className="priceDetail">${item.price}</h5>
           )}
           <p className="stockDetail">En stock: {item.stock}</p>
+          <Col
+            className="d-flex flex-row align-items-center text-center"
+            as={Row}
+            xs={{ span: 6, offset: 3 }}
+            style={{ marginBottom: "20px" }}
+          >
+            <Col className="d-flex flex-row align-items-center text-center">
+              <StarFill size={25} color="#CD9D00"></StarFill>
+              <p style={{ margin: 0, marginLeft: "1px", marginRight: "10px" }}>
+                {props.item.rating}
+              </p>
+            </Col>
+            <Col>
+              <FavoriteHeart
+                size={25}
+                isFavorite={isFavorite}
+                productCode={props.item.code}
+              ></FavoriteHeart>
+            </Col>
+          </Col>
           <ItemCount product={item} isOnSale={isOnSale} sale={saleObject} />
+        </Col>
+        <Col
+          xs={12}
+          as={Row}
+          className="justify-content-center d-flex align-items-center"
+          style={{ marginTop: "25px", marginBottom: "25px" }}
+        >
+          <Col
+            xs={12}
+            className="justify-content-center d-flex align-items-center"
+          >
+            <h4>Descripcion del producto:</h4>
+          </Col>
+          <Col
+            xs={12}
+            className="justify-content-center d-flex align-items-center"
+          >
+            <p style={{ margin: 0 }}>{item.detailedDescription}</p>
+          </Col>
         </Col>
       </Row>
     </Container>

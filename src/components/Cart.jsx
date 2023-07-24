@@ -138,8 +138,9 @@ export default function Cart() {
                 style={{
                   marginTop: "25px",
                   marginBottom: "25px",
-                  backgroundColor: "var(--bs-secondary-bg)",
                   borderRadius: "var(--bs-border-radius)",
+                  backgroundColor: "var(--bs-dark-bg-subtle)",
+                  color: "color: var(--bs-emphasis-color)",
                   paddingTop: "15px",
                   paddingBottom: "15px",
                 }}

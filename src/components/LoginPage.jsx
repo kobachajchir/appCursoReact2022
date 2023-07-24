@@ -157,6 +157,18 @@ function LoginPage(props) {
                 />
               </Col>
               <Col xs={12}>
+                <a
+                  style={{
+                    padding: 0,
+                    margin: 0,
+                    textDecoration: "none",
+                  }}
+                  href=""
+                >
+                  Olvido su usuario?
+                </a>
+              </Col>
+              <Col xs={12}>
                 <label
                   htmlFor="password"
                   style={{ marginRight: "10px", fontSize: "1.15rem" }}
@@ -178,6 +190,18 @@ function LoginPage(props) {
                   style={inputStyles}
                 />
               </Col>
+              <Col xs={12}>
+                <a
+                  style={{
+                    padding: 0,
+                    margin: 0,
+                    textDecoration: "none",
+                  }}
+                  href=""
+                >
+                  Olvido su contraseña?
+                </a>
+              </Col>
               <Col
                 xs={12}
                 as={Row}
@@ -190,7 +214,12 @@ function LoginPage(props) {
                     marginTop: "15px",
                   }}
                 >
-                  <Button onClick={handleLogin}>Ingresar</Button>
+                  <Button
+                    onClick={handleLogin}
+                    style={{ paddingLeft: "60px", paddingRight: "60px" }}
+                  >
+                    Ingresar
+                  </Button>
                 </Col>
                 <Col
                   xs={12}
@@ -205,7 +234,12 @@ function LoginPage(props) {
                   >
                     No estas registrado?
                   </p>
-                  <Button variant="outline-primary">Registrarse</Button>
+                  <Button
+                    variant="outline-primary"
+                    style={{ paddingLeft: "60px", paddingRight: "60px" }}
+                  >
+                    Registrarse
+                  </Button>
                 </Col>
               </Col>
               <div style={{ marginTop: "20px", marginBottom: "20px" }}>
