@@ -19,6 +19,7 @@ function LoginPage(props) {
   const [wrongPass, setWrongPass] = useState(false);
   const [noUser, setNoUser] = useState(false);
   const [tooManyAttempts, setTooManyAttempts] = useState(false);
+  const [accountDisabled, setAccountDisabled] = useState(false);
 
   const handleMouseEnter = (evt) => {
     setBgColor(evt.target.getAttribute("data-bgcolor"));
@@ -100,14 +101,22 @@ function LoginPage(props) {
         setNoUser(true);
         setWrongPass(false);
         setTooManyAttempts(false);
+        setAccountDisabled(false);
       } else if (props.error.code === "auth/wrong-password") {
         setWrongPass(true);
         setNoUser(false);
         setTooManyAttempts(false);
+        setAccountDisabled(false);
       } else if (props.error.code === "auth/too-many-requests") {
         setNoUser(false);
         setWrongPass(false);
         setTooManyAttempts(true);
+        setAccountDisabled(false);
+      } else if (props.error.code === "auth/account-disabled") {
+        setNoUser(false);
+        setWrongPass(false);
+        setTooManyAttempts(false);
+        setAccountDisabled(true);
       }
       reset();
     }
@@ -146,10 +155,16 @@ function LoginPage(props) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onClick={() => {
-                    if (wrongPass || noUser) {
+                    if (
+                      wrongPass ||
+                      noUser ||
+                      accountDisabled ||
+                      tooManyAttempts
+                    ) {
                       setWrongPass(false);
                       setNoUser(false);
                       setTooManyAttempts(false);
+                      setAccountDisabled(false);
                     }
                   }}
                   type="email"
@@ -180,10 +195,16 @@ function LoginPage(props) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onClick={() => {
-                    if (wrongPass || noUser) {
+                    if (
+                      wrongPass ||
+                      noUser ||
+                      accountDisabled ||
+                      tooManyAttempts
+                    ) {
                       setWrongPass(false);
                       setNoUser(false);
                       setTooManyAttempts(false);
+                      setAccountDisabled(false);
                     }
                   }}
                   type="password"
@@ -314,6 +335,11 @@ function LoginPage(props) {
           <Col xs={12} style={{ marginTop: "10px" }}>
             <Button variant="secondary">Restablecer contraseña</Button>
           </Col>
+        </LoginErrorBanner>
+      )}
+      {accountDisabled && (
+        <LoginErrorBanner>
+          <p>La cuenta esta deshabilitada</p>
         </LoginErrorBanner>
       )}
     </Container>

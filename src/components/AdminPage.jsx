@@ -3,13 +3,14 @@ import { useMediaQuery } from "react-responsive";
 import CompanyDataPanel from "./CompanyDataPanel";
 import { useState } from "react";
 import ProductsPanel from "./ProductsPanel";
+import UserPanel from "./UserPanel";
 
 export default function AdminPage() {
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
-  const [activeTab, setActiveTab] = useState("products");
+  const [activeTab, setActiveTab] = useState("users");
   return (
     <Tab.Container
-      defaultActiveKey="company"
+      defaultActiveKey={activeTab}
       className="d-flex justify-content-center align-items-center"
       activeKey={activeTab}
       onSelect={(key) => setActiveTab(key)}
@@ -106,7 +107,7 @@ export default function AdminPage() {
               }`}
               style={{ marginTop: "25px", marginBottom: "25px" }}
             >
-              Pestaña Usuarios
+              <UserPanel />
             </Tab.Pane>
             <Tab.Pane
               eventKey="contact"

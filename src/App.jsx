@@ -140,15 +140,17 @@ function App() {
       const auth = getAuth();
       signInWithEmailAndPassword(auth, email, password)
         .then(async (userCredential) => {
-          console.log(userCredential);
           const userData = await fetchUserData(email);
-          if (userData) {
+          console.log(userData);
+          if (userData.enabled) {
             setUserInfo(userData);
             setUserLogged(true);
             goToHome();
           } else {
-            setUserInfo(undefined);
+            setUserInfo(genericUserData);
             setUserLogged(false);
+            const error = { code: "auth/account-disabled" };
+            handleLoginError(error);
           }
         })
         .catch((error) => {
