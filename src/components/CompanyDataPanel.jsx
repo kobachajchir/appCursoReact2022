@@ -163,7 +163,7 @@ const CompanyDataPanel = () => {
           marginTop: "20px",
         }}
       >
-        <Button onClick={handleReset} className="me-2">
+        <Button onClick={handleReset} className="me-2" variant="danger">
           Restablecer
         </Button>
         <Button onClick={handleSave} disabled={!isChanged}>

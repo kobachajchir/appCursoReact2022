@@ -62,7 +62,6 @@ export default function UserPanel() {
     fetchUsers()
       .then((userList) => {
         setUsersList(userList);
-        console.log(userList);
       })
       .catch((error) => console.error(error));
   }, []);
@@ -157,7 +156,7 @@ export default function UserPanel() {
       )}
       <Row>
         <Col xs={12}>
-          <h3>User List</h3>
+          <h3>Listado de usuarios</h3>
         </Col>
       </Row>
       <Row
@@ -258,6 +257,9 @@ export default function UserPanel() {
                           style={{
                             backgroundColor: "transparent",
                             border: "none",
+                            color: "var(--bs-secondary-text-emphasis)",
+                            display: "flex",
+                            alignItems: "center",
                           }}
                         >
                           <ThreeDotsVertical />
@@ -296,47 +298,63 @@ export default function UserPanel() {
         <Modal.Body>
           <Form>
             <Form.Group controlId="formAccountType">
-              <Form.Label>Tipo de cuenta</Form.Label>
-              <Form.Control
-                as="select"
-                value={newType}
-                onChange={(e) => setNewType(e.target.value)}
-                onSelect={(e) => setNewType(e.target.value)}
-              >
-                <option value="user" disabled={selectedUser?.status === "user"}>
-                  Usuario{selectedUser?.status === "user" ? " (Actual)" : ""}
-                </option>
-                <option
-                  value="admin"
-                  disabled={selectedUser?.status === "admin"}
-                >
-                  Administrador
-                  {selectedUser?.status === "admin" ? " (Actual)" : ""}
-                </option>
-                <option
-                  value="seller"
-                  disabled={selectedUser?.status === "seller"}
-                >
-                  Vendedor{selectedUser?.status === "seller" ? " (Actual)" : ""}
-                </option>
-              </Form.Control>
+              <Row className="d-flex justify-content-center align-items-center">
+                <Col xs={"auto"}>
+                  <Form.Label>Tipo de cuenta</Form.Label>
+                </Col>
+                <Col xs={"auto"}>
+                  <Form.Control
+                    as="select"
+                    value={newType}
+                    onChange={(e) => setNewType(e.target.value)}
+                    onSelect={(e) => setNewType(e.target.value)}
+                  >
+                    <option
+                      value="user"
+                      disabled={selectedUser?.status === "user"}
+                    >
+                      Usuario
+                      {selectedUser?.status === "user" ? " (Actual)" : ""}
+                    </option>
+                    <option
+                      value="admin"
+                      disabled={selectedUser?.status === "admin"}
+                    >
+                      Administrador
+                      {selectedUser?.status === "admin" ? " (Actual)" : ""}
+                    </option>
+                    <option
+                      value="seller"
+                      disabled={selectedUser?.status === "seller"}
+                    >
+                      Vendedor
+                      {selectedUser?.status === "seller" ? " (Actual)" : ""}
+                    </option>
+                  </Form.Control>
+                </Col>
+              </Row>
             </Form.Group>
-
-            <Form.Group controlId="formPassword">
-              <Form.Label>Tu contraseña</Form.Label>
-              <Form.Control
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
-              />
+            <Form.Group controlId="formPassword" style={{ marginTop: "10px" }}>
+              <Row className="d-flex justify-content-center align-items-center">
+                <Col xs={"auto"}>
+                  <Form.Label>Tu contraseña</Form.Label>
+                </Col>
+                <Col xs={"auto"}>
+                  <Form.Control
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="off"
+                  />
+                </Col>
+              </Row>
             </Form.Group>
           </Form>
 
           {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
         </Modal.Body>
         <Modal.Footer className="d-flex justify-content-evenly">
-          <Button variant="secondary" onClick={handleCloseChangeType}>
+          <Button variant="danger" onClick={handleCloseChangeType}>
             Cerrar
           </Button>
           <Button variant="primary" onClick={handleSubmitChangeType}>

@@ -42,11 +42,11 @@ export default function ProductsPanel() {
             variant="underline"
             className="flex-row"
             style={{
-              backgroundColor: "var(--bs-dark-bg-subtle)",
               color: "color: var(--bs-emphasis-color)",
               paddingLeft: "30px",
               paddingRight: "30px",
               borderRadius: "10px",
+              marginTop: "-25px",
             }}
           >
             <Nav.Item>
@@ -66,9 +66,6 @@ export default function ProductsPanel() {
             style={{
               minHeight: "50vh",
               minWidth: !isLg ? "60%" : "90%",
-              borderColor: "var(--bs-dark-bg-subtle)",
-              borderRadius: "10px",
-              backgroundColor: "var(--bs-dark-bg-subtle)",
               color: "color: var(--bs-emphasis-color)",
               marginBottom: "25px",
             }}

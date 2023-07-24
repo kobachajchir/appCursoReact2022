@@ -4,10 +4,11 @@ import CompanyDataPanel from "./CompanyDataPanel";
 import { useState } from "react";
 import ProductsPanel from "./ProductsPanel";
 import UserPanel from "./UserPanel";
+import OrderPanel from "./OrderPanel";
 
 export default function AdminPage() {
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
-  const [activeTab, setActiveTab] = useState("users");
+  const [activeTab, setActiveTab] = useState("orders");
   return (
     <Tab.Container
       defaultActiveKey={activeTab}
@@ -62,9 +63,6 @@ export default function AdminPage() {
             style={{
               minHeight: "50vh",
               minWidth: !isLg ? "60%" : "90%",
-              borderColor: "var(--bs-dark-bg-subtle)",
-              borderRadius: "10px",
-              backgroundColor: "var(--bs-dark-bg-subtle)",
               color: "color: var(--bs-emphasis-color)",
               marginBottom: "25px",
             }}
@@ -97,7 +95,7 @@ export default function AdminPage() {
               }`}
               style={{ marginTop: "25px", marginBottom: "25px" }}
             >
-              Pestaña Ventas
+              <OrderPanel />
             </Tab.Pane>
             <Tab.Pane
               eventKey="users"

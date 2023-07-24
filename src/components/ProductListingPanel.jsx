@@ -184,7 +184,6 @@ export default function ProductListingPanel() {
   };
 
   const productStyle = {
-    backgroundColor: "var(--bs-secondary-bg)",
     borderRadius: "var(--bs-border-radius)",
     marginTop: "10px",
     marginBottom: "10px",
@@ -321,7 +320,7 @@ export default function ProductListingPanel() {
       {!selectedProduct &&
         displayedProducts.map((product) => (
           <Row key={product.id} style={productStyle}>
-            <Col xs={12} lg={4}>
+            <Col xs={12} lg={2}>
               <img
                 src={new URL(product.picture[0], import.meta.url).href}
                 alt={product.title}
@@ -330,7 +329,7 @@ export default function ProductListingPanel() {
             </Col>
             <Col
               xs={12}
-              lg={"auto"}
+              lg={5}
               style={{
                 marginTop: isLg ? "10px" : "0",
                 marginBottom: isLg ? "10px" : "0",
@@ -339,7 +338,12 @@ export default function ProductListingPanel() {
               <h5 style={{ margin: 0 }}>{product.title}</h5>
               <p style={{ margin: 0 }}>Código: {product.code}</p>
             </Col>
-            <Col xs={12} as={Row} lg={"auto"}>
+            <Col
+              xs={12}
+              as={Row}
+              lg={5}
+              className="text-center d-flex justify-content-center"
+            >
               <Col xs={6} lg={"auto"}>
                 <Button onClick={() => handleModify(product)}>Modificar</Button>
               </Col>

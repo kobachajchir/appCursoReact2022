@@ -79,7 +79,7 @@ export default function AddProductPanel() {
     <>
       <Form onSubmit={handleSubmit}>
         <Form.Group>
-          <Form.Label>Code</Form.Label>
+          <Form.Label>Codigo</Form.Label>
           <Form.Control
             type="text"
             name="code"
@@ -88,7 +88,7 @@ export default function AddProductPanel() {
           />
         </Form.Group>
         <Form.Group>
-          <Form.Label>Title</Form.Label>
+          <Form.Label>Titulo</Form.Label>
           <Form.Control
             type="text"
             name="title"
@@ -97,7 +97,7 @@ export default function AddProductPanel() {
           />
         </Form.Group>
         <Form.Group>
-          <Form.Label>Category</Form.Label>
+          <Form.Label>Categoria</Form.Label>
           <Form.Control
             as="select"
             defaultValue={selectedCategory}
@@ -130,7 +130,7 @@ export default function AddProductPanel() {
           </Form.Control>
         </Form.Group>
         <Form.Group>
-          <Form.Label>Description</Form.Label>
+          <Form.Label>Descripcion</Form.Label>
           <Form.Control
             type="text"
             name="description"
@@ -139,7 +139,7 @@ export default function AddProductPanel() {
           />
         </Form.Group>
         <Form.Group>
-          <Form.Label>Detailed Description</Form.Label>
+          <Form.Label>Descripcion detallada</Form.Label>
           <Form.Control
             type="text"
             name="detailedDescription"
@@ -148,7 +148,7 @@ export default function AddProductPanel() {
           />
         </Form.Group>
         <Form.Group>
-          <Form.Label>Price</Form.Label>
+          <Form.Label>Precio</Form.Label>
           <Form.Control
             type="number"
             name="price"
