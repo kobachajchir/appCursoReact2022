@@ -46,6 +46,7 @@ export default function CartProvider({ children }) {
 
   function clear() {
     setCart([]);
+    setValidatedCoupon(null);
   }
 
   function isInCart(itemId) {
@@ -69,12 +70,9 @@ export default function CartProvider({ children }) {
     setTotal(total);
     setSaleDiscount(discount);
     setTotalWithDiscount(total - discount);
-  }
-
-  function calculatePriceWithCoupon() {
     if (validatedCoupon) {
       setPriceWithCoupon(
-        (totalWithDiscount * validatedCoupon.discountPercentage) / 100
+        ((total - discount) * validatedCoupon.discountPercentage) / 100
       );
     } else {
       setPriceWithCoupon(0);
@@ -90,8 +88,6 @@ export default function CartProvider({ children }) {
   }
 
   function addValidatedCoupon(coupon) {
-    console.log("Cupon es ");
-    console.log(coupon);
     setValidatedCoupon(coupon);
   }
 
@@ -113,13 +109,9 @@ export default function CartProvider({ children }) {
   }
 
   useEffect(() => {
-    calculatePriceWithCoupon();
-  }, [validatedCoupon]);
-
-  useEffect(() => {
     calculateTotal();
     calculateQuantity();
-  }, [cart]);
+  }, [cart, validatedCoupon]);
 
   return (
     <CartContext.Provider
