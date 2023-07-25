@@ -1,6 +1,13 @@
-import { addDoc, getFirestore } from "firebase/firestore";
-import { useContext, useEffect } from "react";
-import { Col, Container, Row } from "react-bootstrap";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+} from "firebase/firestore";
+import { useContext, useEffect, useState } from "react";
+import { Button, Col, Container, Row } from "react-bootstrap";
 import {
   Cart2,
   Check,
@@ -29,7 +36,12 @@ export default function Cart() {
     quantity,
     saleDiscount,
     totalWithDiscount,
+    validatedCoupon,
+    priceWithCoupon,
+    addValidatedCoupon,
   } = useContext(CartContext);
+  const [coupon, setCoupon] = useState("");
+  const db = getFirestore();
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
   useEffect(() => {}, []);
   function createOrder() {
@@ -57,6 +69,37 @@ export default function Cart() {
     };
     navigate(`/order/1000`, { state: { ...order, id: "test123" } });
   }
+  const fetchCoupons = async () => {
+    const q = query(collection(db, "coupons"), where("code", "==", coupon));
+    const querySnapshot = await getDocs(q);
+    const result = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return result[0];
+  };
+  function validarCupon() {
+    fetchCoupons().then((result) => {
+      console.log(result);
+      if (result) {
+        addValidatedCoupon(result);
+      }
+    });
+  }
+  function deleteCoupon() {
+    addValidatedCoupon(null);
+    setCoupon("");
+  }
+  const inputStyles = {
+    color: "var(--bs-body-color)",
+    backgroundColor: "var(--bs-secondary-bg)",
+    borderRadius: "var(--bs-border-radius)",
+    border: "none",
+    fontSize: "1.25rem",
+    padding: "5px",
+    marginTop: "5px",
+    marginBottom: "5px",
+  };
   return (
     <>
       <Container className="container">
@@ -105,6 +148,59 @@ export default function Cart() {
                     Total: ${totalWithDiscount}
                   </h3>
                 </Col>
+                {!validatedCoupon && (
+                  <Col
+                    xs={12}
+                    className="text-center"
+                    style={{ marginTop: "15px", marginBottom: "15px" }}
+                  >
+                    <label
+                      htmlFor="inputCoupon"
+                      style={{ marginRight: "15px" }}
+                    >
+                      Tienes un cupon?
+                    </label>
+                    <input
+                      type="text"
+                      name="inputCoupon"
+                      id="inputCoupon"
+                      onChange={(e) => setCoupon(e.target.value)}
+                      style={inputStyles}
+                    />
+                    <Button
+                      variant="outline-secondary"
+                      onClick={validarCupon}
+                      style={{
+                        marginLeft: "15px",
+                        color: "var(--bs-body-color)",
+                      }}
+                    >
+                      Validar cupon
+                    </Button>
+                  </Col>
+                )}
+                {validatedCoupon && (
+                  <>
+                    <Col xs={12} className="text-center">
+                      <h5 style={{ margin: 0, color: "red" }}>
+                        Descuentos del cupon: ${priceWithCoupon}
+                      </h5>
+                      <h3 style={{ marginTop: 0 }}>
+                        Total con cupon "{validatedCoupon.code.toUpperCase()}":
+                        ${totalWithDiscount - priceWithCoupon}
+                      </h3>
+                    </Col>
+                    <Col xs={12} className="text-center">
+                      <Button
+                        variant="danger"
+                        onClick={deleteCoupon}
+                        style={{ marginTop: "5px", marginBottom: "20px" }}
+                      >
+                        Eliminar cupon
+                      </Button>
+                    </Col>
+                  </>
+                )}
                 <Col xs={12} className="text-center">
                   <Row className="justify-content-center">
                     <Col

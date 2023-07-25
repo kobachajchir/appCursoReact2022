@@ -7,6 +7,8 @@ export default function CartProvider({ children }) {
   const [total, setTotal] = useState(0);
   const [saleDiscount, setSaleDiscount] = useState(0);
   const [totalWithDiscount, setTotalWithDiscount] = useState(0);
+  const [validatedCoupon, setValidatedCoupon] = useState(null);
+  const [priceWithCoupon, setPriceWithCoupon] = useState(0);
 
   function addItem(item, quantity, isOnSale, sale = null) {
     if (isOnSale) {
@@ -69,12 +71,28 @@ export default function CartProvider({ children }) {
     setTotalWithDiscount(total - discount);
   }
 
+  function calculatePriceWithCoupon() {
+    if (validatedCoupon) {
+      setPriceWithCoupon(
+        (totalWithDiscount * validatedCoupon.discountPercentage) / 100
+      );
+    } else {
+      setPriceWithCoupon(0);
+    }
+  }
+
   function calculateQuantity() {
     let quantity = 0;
     cart.forEach((cartItem) => {
       quantity += cartItem.quantity;
     });
     setQuantity(quantity);
+  }
+
+  function addValidatedCoupon(coupon) {
+    console.log("Cupon es ");
+    console.log(coupon);
+    setValidatedCoupon(coupon);
   }
 
   function buyCart() {
@@ -95,6 +113,10 @@ export default function CartProvider({ children }) {
   }
 
   useEffect(() => {
+    calculatePriceWithCoupon();
+  }, [validatedCoupon]);
+
+  useEffect(() => {
     calculateTotal();
     calculateQuantity();
   }, [cart]);
@@ -113,6 +135,9 @@ export default function CartProvider({ children }) {
         quantity,
         saleDiscount,
         totalWithDiscount,
+        validatedCoupon,
+        priceWithCoupon,
+        addValidatedCoupon,
       }}
     >
       {children}

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useContext, useState } from "react";
-import { Col, Row } from "react-bootstrap";
+import { Button, Col, Row } from "react-bootstrap";
 import { DashLg, PlusLg } from "react-bootstrap-icons";
 import { CartContext } from "../context/CartContext";
 import "./../styles/ItemCount.css";
@@ -24,7 +24,7 @@ export function ItemCount({ product, isOnSale, sale }) {
   }, [cart]);
   return (
     <div id={"itemCounter" + product.id}>
-      {addedToCart == false ? (
+      {addedToCart == false && product.stock > 0 && (
         <>
           <div className="w-100"></div>
           <Row className="justify-content-center">
@@ -67,9 +67,19 @@ export function ItemCount({ product, isOnSale, sale }) {
             </Col>
           </Row>
         </>
-      ) : (
+      )}
+      {addedToCart && (
         <Row as={Col} xs={3} className="justify-content-center">
           <ToCartButton />
+        </Row>
+      )}
+      {product.stock <= 0 && (
+        <Row as={Col} xs={3} className="justify-content-center">
+          <Col>
+            <Button variant="danger" disabled>
+              No hay stock
+            </Button>
+          </Col>
         </Row>
       )}
     </div>

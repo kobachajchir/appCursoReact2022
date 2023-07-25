@@ -1,32 +1,12 @@
-import { useState, useEffect, useContext, useCallback } from "react";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
-import {
-  Col,
-  Row,
-  Button,
-  FormControl,
-  FormCheck,
-  FormSelect,
-  Container,
-  Tab,
-  Nav,
-} from "react-bootstrap";
-import EditProductPanel from "./EditProductPanel";
-import { GeneralCompany } from "../App";
-import ProductListingPanel from "./ProductListingPanel";
+import { Col, Nav, Row, Tab } from "react-bootstrap";
+import AddSalesPanel from "./AddSalesPanel";
 import { useMediaQuery } from "react-responsive";
-import AddProductPanel from "./AddProductPanel";
-import SalesPanel from "./SalesPanel";
+import { useState } from "react";
+import ListSales from "./ListSales";
 
-export default function ProductsPanel() {
+export default function SalesPanel() {
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
-  const [activeTab, setActiveTab] = useState("listProds");
+  const [activeTab, setActiveTab] = useState("listSales");
   return (
     <Tab.Container
       defaultActiveKey="company"
@@ -51,10 +31,10 @@ export default function ProductsPanel() {
             }}
           >
             <Nav.Item>
-              <Nav.Link eventKey="addProd">Agregar producto</Nav.Link>
+              <Nav.Link eventKey="addSales">Agregar ofertas</Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link eventKey="listProds">Listar productos</Nav.Link>
+              <Nav.Link eventKey="listSales">Listar ofertas</Nav.Link>
             </Nav.Item>
           </Nav>
         </Col>
@@ -72,24 +52,24 @@ export default function ProductsPanel() {
             }}
           >
             <Tab.Pane
-              eventKey="addProd"
+              eventKey="addSales"
               as={Row}
               className={`d-flex justify-content-center align-items-center text-center ${
-                activeTab !== "addProd" && "d-none"
+                activeTab !== "addSales" && "d-none"
               }`}
               style={{ marginTop: "25px", marginBottom: "25px" }}
             >
-              <AddProductPanel />
+              <AddSalesPanel />
             </Tab.Pane>
             <Tab.Pane
-              eventKey="listProds"
+              eventKey="listSales"
               as={Row}
               className={`d-flex justify-content-center align-items-center text-center ${
-                activeTab !== "listProds" && "d-none"
+                activeTab !== "listSales" && "d-none"
               }`}
               style={{ marginTop: "25px", marginBottom: "25px" }}
             >
-              <ProductListingPanel />
+              <ListSales />
             </Tab.Pane>
           </Tab.Content>
         </Col>

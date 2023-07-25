@@ -5,13 +5,13 @@ import { useState } from "react";
 import ProductsPanel from "./ProductsPanel";
 import UserPanel from "./UserPanel";
 import OrderPanel from "./OrderPanel";
+import SalesPanel from "./SalesPanel";
 
 export default function AdminPage() {
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
-  const [activeTab, setActiveTab] = useState("orders");
+  const [activeTab, setActiveTab] = useState("sales");
   return (
     <Tab.Container
-      defaultActiveKey={activeTab}
       className="d-flex justify-content-center align-items-center"
       activeKey={activeTab}
       onSelect={(key) => setActiveTab(key)}
@@ -39,6 +39,9 @@ export default function AdminPage() {
             </Nav.Item>
             <Nav.Item>
               <Nav.Link eventKey="products">Productos</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="sales">Ofertas</Nav.Link>
             </Nav.Item>
             <Nav.Item>
               <Nav.Link eventKey="orders">Ventas</Nav.Link>
@@ -86,6 +89,16 @@ export default function AdminPage() {
               style={{ marginTop: "25px", marginBottom: "25px" }}
             >
               <ProductsPanel />
+            </Tab.Pane>
+            <Tab.Pane
+              eventKey="sales"
+              as={Row}
+              className={`d-flex justify-content-center align-items-center text-center ${
+                activeTab !== "sales" && "d-none"
+              }`}
+              style={{ marginTop: "25px", marginBottom: "25px" }}
+            >
+              <SalesPanel />
             </Tab.Pane>
             <Tab.Pane
               eventKey="orders"

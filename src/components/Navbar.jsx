@@ -24,7 +24,8 @@ export default function NavigationBar() {
     setUserInfo: setUserInfo,
   } = useContext(GeneralCompany);
   const [navbarBrand, setNavbarBrand] = useState(compInfo.companyName);
-  const { quantity, totalWithDiscount } = useContext(CartContext);
+  const { quantity, totalWithDiscount, validatedCoupon, priceWithCoupon } =
+    useContext(CartContext);
   useEffect(() => setNavbarBrand(compInfo.companyName), [compInfo]);
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
   function logOut() {
@@ -168,9 +169,15 @@ export default function NavigationBar() {
                     {quantity}
                     {"\u00A0"}
                   </span>
-                  <span className="cartItemCounter order-2">
-                    {"\u00A0"}${totalWithDiscount}
-                  </span>
+                  {validatedCoupon ? (
+                    <span className="cartItemCounter order-2">
+                      {"\u00A0"}${totalWithDiscount - priceWithCoupon}
+                    </span>
+                  ) : (
+                    <span className="cartItemCounter order-2">
+                      {"\u00A0"}${totalWithDiscount}
+                    </span>
+                  )}
                 </>
               )}
             </Nav.Link>
