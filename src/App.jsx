@@ -2,7 +2,7 @@ import { createContext, useCallback, useEffect, useState } from "react";
 import "./App.css";
 import Navigationbar from "./components/Navbar";
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
-import { Container } from "react-bootstrap";
+import { Container, ToastContainer } from "react-bootstrap";
 import ItemListContainer from "./components/ItemListContainer";
 import ItemDetailContainer from "./components/ItemDetailContainer";
 import Home from "./components/Home";
@@ -19,6 +19,7 @@ import {
   getDocs,
   getFirestore,
   query,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { getAuth, signInWithEmailAndPassword, signOut } from "firebase/auth";
@@ -28,6 +29,7 @@ import Contact from "./components/Contact";
 import AdminPage from "./components/AdminPage";
 import LoginPage from "./components/LoginPage";
 import Footer from "./components/Footer";
+import UserOrders from "./components/UserOrders";
 export const GeneralCompany = createContext();
 const firebaseConfig = {
   apiKey: "AIzaSyClyM0t39WQ8SI37pIZycGy2o02d57byxs",
@@ -54,6 +56,7 @@ function App() {
   const [isUserLogged, setUserLogged] = useState(false);
   const [error, setError] = useState(undefined);
   const [developerData, setDeveloperData] = useState();
+  const [userDocRef, setUserDocRef] = useState(null);
 
   const handleLoginError = (error) => {
     console.log(error);
@@ -103,6 +106,7 @@ function App() {
     const results = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
     return results;
   };
+
   const fetchUserData = useCallback(async (userEmail) => {
     const q = query(
       collection(db, "users"),
@@ -110,45 +114,75 @@ function App() {
     );
     const querySnapshot = await getDocs(q);
     let userData;
+    let docRef;
     querySnapshot.forEach((doc) => {
       userData = doc.data();
+      docRef = doc.ref;
     });
-    return userData;
+    return [docRef, userData];
   }, []);
+
   function updateUserTheme(isDarkTheme) {
     setUserInfo((userInfo) => ({ ...userInfo, prefersDarkMode: isDarkTheme }));
+
+    if (userDocRef) {
+      updateDoc(userDocRef, {
+        prefersDarkMode: isDarkTheme,
+      })
+        .then(() => {
+          console.log("User theme preference updated in Firestore");
+        })
+        .catch((error) => {
+          console.error("Error updating theme preference: ", error);
+        });
+    }
   }
+
   function updateUserFavorites(favorites) {
     setUserInfo((userInfo) => ({ ...userInfo, favorites: favorites }));
+
+    if (userDocRef) {
+      updateDoc(userDocRef, {
+        favorites: favorites,
+      })
+        .then(() => {
+          console.log("User favorites updated in Firestore");
+        })
+        .catch((error) => {
+          console.error("Error updating favorites: ", error);
+        });
+    }
   }
+
   function updateCompData(info) {
     setCompanyInfo(info);
   }
   function logOut() {
     signOut(auth)
       .then(() => {
-        // Sign-out successful.
+        setUserInfo(genericUserData);
+        setUserLogged(false);
+        setUserDocRef(null);
       })
       .catch((error) => {
         console.log(error);
       });
-    setUserInfo(genericUserData);
-    setUserLogged(false);
   }
   const logIn = useCallback(
     (email, password) => {
       const auth = getAuth();
       signInWithEmailAndPassword(auth, email, password)
         .then(async (userCredential) => {
-          const userData = await fetchUserData(email);
-          console.log(userData);
+          const [docRef, userData] = await fetchUserData(email);
           if (userData.enabled) {
             setUserInfo(userData);
             setUserLogged(true);
+            setUserDocRef(docRef);
             goToHome();
           } else {
             setUserInfo(genericUserData);
             setUserLogged(false);
+            setUserDocRef(null);
             const error = { code: "auth/account-disabled" };
             handleLoginError(error);
           }
@@ -157,6 +191,7 @@ function App() {
           handleLoginError(error);
           setUserInfo(genericUserData);
           setUserLogged(false);
+          console.log(error);
         });
     },
     [fetchUserData]
@@ -250,7 +285,7 @@ function App() {
                     path="/user/favorites"
                     element={<FavoritesListContainer />}
                   />
-                  <Route path="/user/myOrders" element={<User />} />
+                  <Route path="/user/myOrders" element={<UserOrders />} />
                   <Route path="/user/settings" element={<User />} />
                   <Route path="*" element={<NotFound />} />
                 </>

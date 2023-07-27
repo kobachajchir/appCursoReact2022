@@ -83,8 +83,7 @@ export default function SaleForm({ sale, onSubmit, onClose }) {
     });
   };
 
-  const handleSaleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSaleSubmit = async () => {
     try {
       if (sale) {
         await updateDoc(doc(db, "sales", sale.id), {
@@ -112,17 +111,30 @@ export default function SaleForm({ sale, onSubmit, onClose }) {
       console.error("Error adding or updating document: ", e);
     }
   };
+  const inputStyles = {
+    color: "var(--bs-body-color)",
+    backgroundColor: "var(--bs-secondary-bg)",
+    borderRadius: "var(--bs-border-radius)",
+    border: "none",
+    fontSize: "1.25rem",
+    padding: "5px",
+    textAlign: "center",
+  };
+  const labelStyles = {
+    marginTop: "10px",
+  };
   return (
-    <>
+    <div className="d-flex flex-column justify-content-center">
       {sale && (
         <Button variant="danger" onClick={onClose}>
           Cancelar edicion
         </Button>
       )}
-      <Form onSubmit={handleSaleSubmit}>
+      <Form>
         <Form.Group controlId="formDiscountPercentage">
-          <Form.Label>Porcentaje de descuento</Form.Label>
+          <Form.Label style={labelStyles}>Porcentaje de descuento</Form.Label>
           <Form.Control
+            style={inputStyles}
             type="number"
             value={discountPercentage}
             onChange={(e) => setDiscountPercentage(e.target.value)}
@@ -132,8 +144,9 @@ export default function SaleForm({ sale, onSubmit, onClose }) {
           />
         </Form.Group>
         <Form.Group controlId="formDiscountAvailable">
-          <Form.Label>Cantidad de descuentos</Form.Label>
+          <Form.Label style={labelStyles}>Cantidad de descuentos</Form.Label>
           <Form.Control
+            style={inputStyles}
             type="number"
             value={discountAvaliable}
             onChange={(e) => setDiscountAvailable(e.target.value)}
@@ -142,19 +155,29 @@ export default function SaleForm({ sale, onSubmit, onClose }) {
           />
         </Form.Group>
         <Form.Group controlId="formDiscountEnding">
-          <Form.Label>Finalizacion del descuento</Form.Label>
+          <Form.Label style={labelStyles}>
+            Finalizacion del descuento
+          </Form.Label>
           <Form.Control
+            style={inputStyles}
             type="datetime-local"
             value={formatDate(discountEnding)}
             onChange={(e) => setDiscountEnding(e.target.value)}
             required
           />
         </Form.Group>
-        <Form.Label>Productos participantes</Form.Label>
+        <Form.Label style={labelStyles}>Productos participantes</Form.Label>
         <ListGroup>
           {products &&
             products.map((product) => (
-              <ListGroup.Item key={product.id}>
+              <ListGroup.Item
+                key={product.id}
+                style={{
+                  ...inputStyles,
+                  marginTop: "2.5px",
+                  marginBottom: "2.5px",
+                }}
+              >
                 <Row>
                   <Col>
                     <Form.Check
@@ -169,10 +192,14 @@ export default function SaleForm({ sale, onSubmit, onClose }) {
               </ListGroup.Item>
             ))}
         </ListGroup>
-        <Button variant="primary" type="submit">
-          {sale ? "Update" : "Add"} Sale
+        <Button
+          variant="primary"
+          onClick={handleSaleSubmit}
+          style={{ marginTop: "15px" }}
+        >
+          {sale ? "Modificar" : "Agregar"} oferta
         </Button>
       </Form>
-    </>
+    </div>
   );
 }

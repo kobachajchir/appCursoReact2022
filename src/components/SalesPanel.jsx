@@ -31,10 +31,10 @@ export default function SalesPanel() {
             }}
           >
             <Nav.Item>
-              <Nav.Link eventKey="addSales">Agregar ofertas</Nav.Link>
+              <Nav.Link eventKey="addSales">Agregar</Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link eventKey="listSales">Listar ofertas</Nav.Link>
+              <Nav.Link eventKey="listSales">Listar</Nav.Link>
             </Nav.Item>
           </Nav>
         </Col>

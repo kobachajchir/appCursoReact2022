@@ -20,9 +20,20 @@ export default function CouponForm({ coupon, onSubmit, onClose }) {
       setAmountAvailable(coupon.amountAvailable);
     }
   }, [coupon]);
-
-  const handleCouponSubmit = async (e) => {
-    e.preventDefault();
+  const inputStyles = {
+    color: "var(--bs-body-color)",
+    backgroundColor: "var(--bs-secondary-bg)",
+    borderRadius: "var(--bs-border-radius)",
+    border: "none",
+    fontSize: "1.25rem",
+    padding: "5px",
+    textAlign: "center",
+  };
+  const labelStyles = {
+    marginTop: "10px",
+  };
+  const handleCouponSubmit = async () => {
+    console.log("submit");
     try {
       if (coupon) {
         await updateDoc(doc(db, "coupons", coupon.id), {
@@ -47,18 +58,18 @@ export default function CouponForm({ coupon, onSubmit, onClose }) {
       console.error("Error adding or updating document: ", e);
     }
   };
-
   return (
-    <>
+    <div className="d-flex flex-column justify-content-center">
       {coupon && (
         <Button variant="danger" onClick={onClose}>
           Cancelar edicion
         </Button>
       )}
-      <Form onSubmit={handleCouponSubmit}>
+      <Form>
         <Form.Group controlId="formCode">
-          <Form.Label>Código del cupón</Form.Label>
+          <Form.Label style={labelStyles}>Código del cupón</Form.Label>
           <Form.Control
+            style={inputStyles}
             type="text"
             value={code}
             onChange={(e) => setCode(e.target.value)}
@@ -66,8 +77,9 @@ export default function CouponForm({ coupon, onSubmit, onClose }) {
           />
         </Form.Group>
         <Form.Group controlId="formDiscountPercentage">
-          <Form.Label>Porcentaje de descuento</Form.Label>
+          <Form.Label style={labelStyles}>Porcentaje de descuento</Form.Label>
           <Form.Control
+            style={inputStyles}
             type="number"
             value={discountPercentage}
             onChange={(e) => setDiscountPercentage(e.target.value)}
@@ -77,8 +89,9 @@ export default function CouponForm({ coupon, onSubmit, onClose }) {
           />
         </Form.Group>
         <Form.Group controlId="formAmountAvailable">
-          <Form.Label>Cantidad de cupones</Form.Label>
+          <Form.Label style={labelStyles}>Cantidad de cupones</Form.Label>
           <Form.Control
+            style={inputStyles}
             type="number"
             value={amountAvailable}
             onChange={(e) => setAmountAvailable(e.target.value)}
@@ -86,10 +99,14 @@ export default function CouponForm({ coupon, onSubmit, onClose }) {
             min={0}
           />
         </Form.Group>
-        <Button variant="primary" type="submit">
-          {coupon ? "Update" : "Add"} Coupon
+        <Button
+          variant="primary"
+          onClick={handleCouponSubmit}
+          style={{ marginTop: "15px" }}
+        >
+          {coupon ? "Modificar" : "Agregar"} cupon
         </Button>
       </Form>
-    </>
+    </div>
   );
 }
