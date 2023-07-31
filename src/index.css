@@ -40,6 +40,8 @@
   width: 100vw;
   margin: 0 !important;
   padding: 0 !important;
+  min-width: 640px;
+  max-width: 1920px;
 }
 
 a {

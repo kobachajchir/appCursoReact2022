@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Col, Container, Row, Table, Button, Dropdown } from "react-bootstrap";
 import OrderDetailPanel from "./OrderDetailPanel";
 import { ThreeDotsVertical } from "react-bootstrap-icons";
+import { formatDate } from "../tools/formatDate";
 
 function OrderPanel() {
   const [orderList, setOrderList] = useState([]);
@@ -13,20 +14,6 @@ function OrderPanel() {
     const data = await getDocs(collection(db, "orders"));
     const results = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
     return results;
-  };
-
-  const formatDate = (firebaseTimestamp) => {
-    // convert Firestore timestamp to JavaScript Date object
-    const jsDate = new Date(firebaseTimestamp.seconds * 1000);
-
-    // format date using Intl.DateTimeFormat
-    const formattedDate = new Intl.DateTimeFormat("es-AR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(jsDate);
-
-    return formattedDate;
   };
 
   useEffect(() => {

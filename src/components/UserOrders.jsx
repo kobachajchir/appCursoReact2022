@@ -7,11 +7,18 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { Col, Container, Row } from "react-bootstrap";
+import { Accordion, Col, Container, Row } from "react-bootstrap";
+import { useMediaQuery } from "react-responsive";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import RatingStar from "./RatingStar";
+import FavoriteHeart from "./FavoriteHeart";
+import { Link } from "react-router-dom";
+import formatDateAndTime from "../tools/formatDate";
 
 export default function UserOrders() {
   const { username } = useContext(GeneralCompany);
   const [orderList, setOrderList] = useState([]);
+  const isLg = useMediaQuery({ query: "(max-width: 992px)" });
   const db = getFirestore();
 
   const fetchOrders = async () => {
@@ -25,22 +32,6 @@ export default function UserOrders() {
       id: doc.id,
     }));
     return results;
-  };
-
-  const formatDate = (firebaseTimestamp) => {
-    // convert Firestore timestamp to JavaScript Date object
-    const jsDate = new Date(firebaseTimestamp.seconds * 1000);
-
-    // format date using Intl.DateTimeFormat
-    const formattedDate = new Intl.DateTimeFormat("es-AR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(jsDate);
-
-    return formattedDate;
   };
 
   useEffect(() => {
@@ -58,19 +49,107 @@ export default function UserOrders() {
             <h2>Mis compras</h2>
           </Col>
           {orderList.map((order, index) => (
-            <Row key={order + index}>
+            <Row
+              key={order + index}
+              style={{
+                backgroundColor: "var(--bs-dark-bg-subtle)",
+                color: "color: var(--bs-emphasis-color)",
+                marginBottom: "25px",
+              }}
+              className="d-flex justify-content-center align-items-center text-center flex-column"
+            >
               <Col xs={12}>
-                <p>{formatDate(order.date)}</p>
+                <h4 style={{ marginTop: "15px" }}>
+                  {formatDateAndTime(order.date)}
+                </h4>
               </Col>
-              <Row>
-                {order.items.map((item) => {
+              <Accordion>
+                {order.items.map((item, indx) => {
                   return (
-                    <Col xs={12} key={item.code}>
-                      <p>{item.code}</p>
-                    </Col>
+                    <Accordion.Item
+                      eventKey={indx}
+                      xs={10}
+                      as={Row}
+                      className={`themeEmphasisBgColor d-flex align-items-center ${
+                        !isLg
+                          ? "flex-row"
+                          : "flex-column justify-content-center text-center"
+                      }`}
+                      key={index}
+                      style={{
+                        backgroundColor: "var(--bs-secondary-bg)",
+                        borderRadius: "var(--bs-border-radius)",
+                        margin: "10px",
+                        paddingTop: "15px",
+                        paddingBottom: "15px",
+                      }}
+                    >
+                      <Accordion.Header>{item.description}</Accordion.Header>
+                      <Accordion.Body>
+                        <>
+                          <Row
+                            as={Col}
+                            xs={12}
+                            lg={"auto"}
+                            className="d-flex flex-column justify-content-center text-center"
+                            style={{
+                              transform: "translateY(5px)",
+                            }}
+                          >
+                            <div
+                              className="d-flex flex-row align-items-cente justify-content-center text-centerr"
+                              style={{ justifyContent: "space-between" }}
+                            ></div>
+                            <p
+                              className="card-text"
+                              style={{ fontSize: "1.1rem" }}
+                            >
+                              {item.description}
+                            </p>
+                          </Row>
+                          <Row
+                            as={Col}
+                            xs={12}
+                            lg={"auto"}
+                            className="d-flex align-items-center justify-content-center"
+                          >
+                            <Row
+                              className={`align-items-center justify-content-center text-center ${
+                                !isLg ? "" : ""
+                              }
+                  }`}
+                              style={{
+                                margin: 0,
+                                marginTop: isLg ? "15px" : 0,
+                                marginBottom: isLg ? "15px" : 0,
+                              }}
+                            >
+                              <Col xs={12} lg={"auto"}>
+                                <p>Cantidad: {item.amount}</p>
+                              </Col>
+                            </Row>
+                          </Row>
+                          <Row
+                            className="row justify-content-center"
+                            as={Col}
+                            xs={12}
+                            lg={"auto"}
+                          >
+                            <Col className="text-center">
+                              <Link
+                                to={"/product/" + item.id}
+                                className="btn btn-primary seeProductInfo"
+                              >
+                                Ver producto
+                              </Link>
+                            </Col>
+                          </Row>
+                        </>
+                      </Accordion.Body>
+                    </Accordion.Item>
                   );
                 })}
-              </Row>
+              </Accordion>
             </Row>
           ))}
         </Row>

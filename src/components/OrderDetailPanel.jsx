@@ -1,23 +1,9 @@
 import { useEffect } from "react";
 import { Button, Table } from "react-bootstrap";
 import { X } from "react-bootstrap-icons";
+import formatDateAndTime from "../tools/formatDate";
 
 function OrderDetailPanel({ order, onClose }) {
-  const formatDate = (firebaseTimestamp) => {
-    // convert Firestore timestamp to JavaScript Date object
-    const jsDate = new Date(firebaseTimestamp.seconds * 1000);
-
-    // format date using Intl.DateTimeFormat
-    const formattedDate = new Intl.DateTimeFormat("es-AR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(jsDate);
-
-    return formattedDate;
-  };
   const handleViewOnMap = () => {
     let lat, long;
     Object.entries(order.shipping.address.mapLocation).map((entry) => {
@@ -73,7 +59,7 @@ function OrderDetailPanel({ order, onClose }) {
                 verticalAlign: "middle",
               }}
             >
-              {formatDate(order.date)}
+              {formatDateAndTime(order.date)}
             </td>
           </tr>
         </tbody>

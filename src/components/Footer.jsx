@@ -7,7 +7,7 @@ function Footer() {
   const { devData: developerData } = useContext(GeneralCompany);
   const styles = {
     color: "var(--bs-body-color)",
-    backgroundColor: "var(--bs-dark-bg-subtle)",
+    backgroundColor: "transparent",
     border: "none",
   };
   function handleContactButton(evt) {
@@ -32,36 +32,37 @@ function Footer() {
   };
 
   return (
-    <footer style={styles}>
-      <Container>
-        <Row className="justify-content-evenly align-items-center">
-          <Col
-            className="d-flex justify-content-center text-center"
-            xs={12}
-            lg={"auto"}
-          >
-            &copy; 2023 - Todos los derechos reservados. Diseñado y desarrollado
-            por Koba Chajchir
-          </Col>
-          <Col className="d-flex justify-content-center" xs={12} lg={"auto"}>
-            {developerData.map(({ key, value }) => {
-              const IconComponent = icons[key];
-              return (
-                <Button
-                  key={"devContactButton" + key}
-                  variant="link"
-                  style={styles}
-                  onClick={handleContactButton}
-                  data-key={key}
-                  data-value={value}
-                >
-                  <IconComponent style={{ pointerEvents: "none" }} />
-                </Button>
-              );
-            })}
-          </Col>
-        </Row>
-      </Container>
+    <footer
+      className="d-flex align-items-center justify-content-center"
+      style={{
+        ...styles,
+        position: "absolute",
+        zIndex: 10,
+        top: "100%",
+        width: "100%",
+      }}
+    >
+      <div>
+        &copy; 2023 - Todos los derechos reservados. Diseñado y desarrollado por
+        Koba Chajchir
+      </div>
+      <div>
+        {developerData.map(({ key, value }) => {
+          const IconComponent = icons[key];
+          return (
+            <Button
+              key={"devContactButton" + key}
+              variant="link"
+              style={styles}
+              onClick={handleContactButton}
+              data-key={key}
+              data-value={value}
+            >
+              <IconComponent style={{ pointerEvents: "none" }} />
+            </Button>
+          );
+        })}
+      </div>
     </footer>
   );
 }

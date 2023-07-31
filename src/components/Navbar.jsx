@@ -1,5 +1,4 @@
 import { Link, NavLink } from "react-router-dom";
-import "./../styles/NavigationBar.css";
 import { Container, Nav, Navbar, NavDropdown, NavItem } from "react-bootstrap";
 import { collection, getDocs, getFirestore } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
@@ -23,42 +22,56 @@ export default function NavigationBar() {
     isUserAdmin: isUserAdmin,
     setUserInfo: setUserInfo,
   } = useContext(GeneralCompany);
+
   const [navbarBrand, setNavbarBrand] = useState(compInfo.companyName);
+
   const { quantity, totalWithDiscount, validatedCoupon, priceWithCoupon } =
     useContext(CartContext);
+
   useEffect(() => setNavbarBrand(compInfo.companyName), [compInfo]);
+
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
+
   function logOut() {
     setUserInfo({ ...userInfo, isUserLogged: false });
   }
+
   function logIn() {
     setUserInfo({ ...userInfo, isUserLogged: true });
   }
+
+  const navbarStyle = {
+    backgroundColor: "var(--bs-dark-bg-subtle)",
+    zIndex: 2,
+  };
+
+  const brandAndLinkStyle = {
+    marginRight: !isLg ? "var(--bs-navbar-brand-margin-end)" : "-50px",
+  };
+
+  const themeChangerStyle = {
+    paddingLeft: !isLg ? "8px" : 0,
+    paddingRight: !isLg ? "8px" : 0,
+  };
+
+  const cartItemCounterStyle = {
+    order: 0,
+  };
+
   return (
-    <Navbar
-      collapseOnSelect
-      expand="lg"
-      style={{
-        backgroundColor: "var(--bs-dark-bg-subtle)",
-      }}
-    >
+    <Navbar collapseOnSelect expand="lg" fixed="top" style={navbarStyle}>
       <Container>
         <Navbar.Brand
           as={Link}
           to={"/"}
           className="order-0"
-          style={{
-            marginRight: !isLg ? "var(--bs-navbar-brand-margin-end)" : "-50px",
-          }}
+          style={brandAndLinkStyle}
         >
           {navbarBrand}
         </Navbar.Brand>
         <Nav.Link
           className={`d-flex align-items-center ${!isLg ? "order-1" : ""}`}
-          style={{
-            paddingLeft: !isLg ? "8px" : 0,
-            paddingRight: !isLg ? "8px" : 0,
-          }}
+          style={themeChangerStyle}
         >
           <ThemeChanger />
         </Nav.Link>
@@ -165,7 +178,10 @@ export default function NavigationBar() {
               {!isLg ? <CartFill className="order-1" /> : "Carrito"}
               {quantity > 0 && (
                 <>
-                  <span className="cartItemCounter order-0">
+                  <span
+                    className="cartItemCounter"
+                    style={cartItemCounterStyle}
+                  >
                     {quantity}
                     {"\u00A0"}
                   </span>

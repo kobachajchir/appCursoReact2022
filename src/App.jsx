@@ -30,6 +30,7 @@ import AdminPage from "./components/AdminPage";
 import LoginPage from "./components/LoginPage";
 import Footer from "./components/Footer";
 import UserOrders from "./components/UserOrders";
+import { ParallaxProvider } from "react-scroll-parallax";
 export const GeneralCompany = createContext();
 const firebaseConfig = {
   apiKey: "AIzaSyClyM0t39WQ8SI37pIZycGy2o02d57byxs",
@@ -248,51 +249,61 @@ function App() {
         }}
       >
         <CartProvider>
-          {isUserLogged && !loading && <Navigationbar />}
-          <div id="routerComponentOutlet" style={{ minHeight: "90vh" }}>
-            <Routes>
-              {!isUserLogged ? (
-                <>
-                  <Route
-                    path="/login"
-                    element={<LoginPage logIn={logIn} error={error} />}
-                  />
-                  <Route path="*" element={<NotLoginRedirect />} />
-                </>
-              ) : (
-                <>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/login" element={<LoginRedirect />} />
-                  <Route path="/aboutUs" element={<AboutUs />} />
-                  <Route path="/contact" element={<Contact />} />
-                  {userInfo.status === "admin" && (
-                    <Route path="/adminPage" element={<AdminPage />} />
-                  )}
-                  <Route path="/cart" element={<Cart />} />
-                  <Route
-                    path="/category/:idCat"
-                    element={<ItemListContainer />}
-                  />
-                  <Route path="/category/" element={<ItemListContainer />} />
-                  <Route
-                    path="/product/:idProd"
-                    element={<ItemDetailContainer />}
-                  />
-                  <Route path="/order/:idOrder" element={<Order />} />
-                  <Route path="/orders" element={<OrdersContainer />} />
-                  <Route path="/user/" element={<User />} />
-                  <Route
-                    path="/user/favorites"
-                    element={<FavoritesListContainer />}
-                  />
-                  <Route path="/user/myOrders" element={<UserOrders />} />
-                  <Route path="/user/settings" element={<User />} />
-                  <Route path="*" element={<NotFound />} />
-                </>
-              )}
-            </Routes>
-          </div>
-          {isUserLogged && !loading && <Footer />}
+          <ParallaxProvider>
+            {isUserLogged && !loading && <Navigationbar />}
+            <div
+              id="routerComponentOutlet"
+              style={{ minHeight: "90vh", marginTop: "50px" }}
+            >
+              <Routes>
+                {!isUserLogged ? (
+                  <>
+                    <Route
+                      path="/login"
+                      element={<LoginPage logIn={logIn} error={error} />}
+                    />
+                    <Route path="*" element={<NotLoginRedirect />} />
+                  </>
+                ) : (
+                  !loading && (
+                    <>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/login" element={<LoginRedirect />} />
+                      <Route path="/aboutUs" element={<AboutUs />} />
+                      <Route path="/contact" element={<Contact />} />
+                      {userInfo.status === "admin" && (
+                        <Route path="/adminPage" element={<AdminPage />} />
+                      )}
+                      <Route path="/cart" element={<Cart />} />
+                      <Route
+                        path="/category/:idCat"
+                        element={<ItemListContainer />}
+                      />
+                      <Route
+                        path="/category/"
+                        element={<ItemListContainer />}
+                      />
+                      <Route
+                        path="/product/:idProd"
+                        element={<ItemDetailContainer />}
+                      />
+                      <Route path="/order/:idOrder" element={<Order />} />
+                      <Route path="/orders" element={<OrdersContainer />} />
+                      <Route path="/user/" element={<User />} />
+                      <Route
+                        path="/user/favorites"
+                        element={<FavoritesListContainer />}
+                      />
+                      <Route path="/user/myOrders" element={<UserOrders />} />
+                      <Route path="/user/settings" element={<User />} />
+                      <Route path="*" element={<NotFound />} />
+                    </>
+                  )
+                )}
+              </Routes>
+            </div>
+            {isUserLogged && !loading && <Footer />}
+          </ParallaxProvider>
         </CartProvider>
       </GeneralCompany.Provider>
     </>

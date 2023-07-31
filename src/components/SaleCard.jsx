@@ -1,21 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Card, Button } from "react-bootstrap";
 import SaleForm from "./SaleForm";
+import { formatDate } from "../tools/formatDate";
 
 export default function SaleCard({ sale, children }) {
-  const formatDate = (firebaseTimestamp) => {
-    // convert Firestore timestamp to JavaScript Date object
-    const jsDate = new Date(firebaseTimestamp.seconds * 1000);
-
-    // format date using Intl.DateTimeFormat
-    const formattedDate = new Intl.DateTimeFormat("es-AR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(jsDate);
-
-    return formattedDate;
-  };
   const textStyles = {
     margin: 0,
     marginTop: "5px",
