@@ -123,7 +123,7 @@ export default function ItemListContainer() {
     <>
       <Container fluid className="themeTerciaryBgColor">
         <Row className="justify-content-center text-center">
-          <Col xs={12}>
+          <Col xs={12} style={{ marginTop: "15px", marginBottom: "15px" }}>
             {idCat ? (
               <h1 className="text-center catTitle">{title()}</h1>
             ) : (

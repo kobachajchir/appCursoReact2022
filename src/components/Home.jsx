@@ -107,13 +107,13 @@ export default function Home(props) {
                           >
                             <stop
                               offset="20%"
-                              stop-color="#001122"
-                              stop-opacity="1"
+                              stopColor="#001122"
+                              stopOpacity="1"
                             ></stop>
                             <stop
                               offset="80%"
-                              stop-color="#001122"
-                              stop-opacity="1"
+                              stopColor="#001122"
+                              stopOpacity="1"
                             ></stop>
                           </linearGradient>
                         </defs>
@@ -127,13 +127,13 @@ export default function Home(props) {
                           >
                             <stop
                               offset="20%"
-                              stop-color="#001122"
-                              stop-opacity="1"
+                              stopColor="#001122"
+                              stopOpacity="1"
                             ></stop>
                             <stop
                               offset="80%"
-                              stop-color="#001122"
-                              stop-opacity="1"
+                              stopColor="#001122"
+                              stopOpacity="1"
                             ></stop>
                           </linearGradient>
                         </defs>

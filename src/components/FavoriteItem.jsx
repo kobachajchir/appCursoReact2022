@@ -5,10 +5,35 @@ import { Link } from "react-router-dom";
 import RatingStar from "./RatingStar";
 import FavoriteHeart from "./FavoriteHeart";
 import { useMediaQuery } from "react-responsive";
+import testImage from "./../assets/images/testProduct.jpg";
+import { useEffect, useState } from "react";
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 export default function FavoriteItem(props) {
-  const imgUrl = new URL(props.item.picture[0], import.meta.url).href;
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
+  const [picture, setPicture] = useState(null);
+  async function fetchProductImage() {
+    const storage = getStorage();
+
+    // Construct the path to the image file in Firebase Storage
+    const imagePath = `appData/productImages/${props.item.code}/${props.item.code}_1.jpg`;
+
+    // Create a reference to the file in Firebase Storage
+    const imageRef = ref(storage, imagePath);
+
+    // Get the download URL for the file
+    try {
+      const url = await getDownloadURL(imageRef);
+      return url;
+    } catch (error) {
+      console.error("Error fetching user profile picture:", error);
+    }
+  }
+  useEffect(() => {
+    fetchProductImage().then((pictureUrl) => {
+      setPicture(pictureUrl);
+    });
+  }, []);
   return (
     <Col
       xs={10}
@@ -34,7 +59,7 @@ export default function FavoriteItem(props) {
         <LazyLoadImage
           className=""
           alt={props.item.code + "ProdImg"}
-          src={imgUrl}
+          src={picture !== null && picture !== undefined ? picture : testImage}
           style={{
             borderRadius: "var(--bs-border-radius)",
             height: "20vh",

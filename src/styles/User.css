@@ -1,0 +1,35 @@
+.image-container {
+  position: relative;
+  width: 25vw;
+  min-width: 200px;
+  height: auto;
+  margin-right: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.profile-img {
+  border-radius: 50%;
+  transition: opacity 0.3s ease;
+}
+
+.profile-img:hover {
+  opacity: 0.5;
+}
+
+.edit-button {
+  position: relative;
+  top: 50%;
+  left: -25%;
+  border: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.profile-img:hover + .edit-button {
+  opacity: 1 !important;
+}
+
+.edit-icon {
+  color: "red";
+}

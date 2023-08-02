@@ -13,6 +13,7 @@ import CartProvider from "./providers/CartProvider";
 import OrdersContainer from "./components/OrdersContainer";
 import Order from "./components/Order";
 import { initializeApp } from "firebase/app";
+import { getStorage } from "firebase/storage";
 import {
   collection,
   doc,
@@ -22,7 +23,12 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { getAuth, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
 import AboutUs from "./components/AboutUs";
 import FavoritesListContainer from "./components/FavoritesListContainer";
 import Contact from "./components/Contact";
@@ -31,6 +37,9 @@ import LoginPage from "./components/LoginPage";
 import Footer from "./components/Footer";
 import UserOrders from "./components/UserOrders";
 import { ParallaxProvider } from "react-scroll-parallax";
+import LoadingComponent from "./components/LoadingComponent";
+import { PersonCheckFill, PersonXFill } from "react-bootstrap-icons";
+import { showNotification } from "./components/ToastNotification";
 export const GeneralCompany = createContext();
 const firebaseConfig = {
   apiKey: "AIzaSyClyM0t39WQ8SI37pIZycGy2o02d57byxs",
@@ -40,7 +49,8 @@ const firebaseConfig = {
   messagingSenderId: "399612336262",
   appId: "1:399612336262:web:6ce144e7f2f050b6541907",
 };
-initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
 
 function App() {
   const db = getFirestore();
@@ -117,7 +127,7 @@ function App() {
     let userData;
     let docRef;
     querySnapshot.forEach((doc) => {
-      userData = doc.data();
+      userData = { ...doc.data(), id: doc.id };
       docRef = doc.ref;
     });
     return [docRef, userData];
@@ -158,61 +168,71 @@ function App() {
   function updateCompData(info) {
     setCompanyInfo(info);
   }
-  function logOut() {
+
+  useEffect(() => {
+    const auth = getAuth();
+
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const [docRef, userData] = await fetchUserData(user.email);
+        if (userData.enabled) {
+          setUserInfo(userData);
+          setUserLogged(true);
+          setUserDocRef(docRef);
+        } else {
+          const error = { code: "auth/account-disabled" };
+          handleLoginError(error);
+        }
+      } else {
+        setUserInfo(genericUserData);
+        setUserLogged(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const logIn = useCallback((email, password) => {
+    const auth = getAuth();
+    signInWithEmailAndPassword(auth, email, password).catch((error) => {
+      handleLoginError(error);
+      setUserInfo(genericUserData);
+      setUserLogged(false);
+      console.log(error);
+    });
+  }, []);
+
+  const logOut = () => {
+    console.log("here");
+    const auth = getAuth();
     signOut(auth)
       .then(() => {
         setUserInfo(genericUserData);
         setUserLogged(false);
         setUserDocRef(null);
+        showNotification(
+          <PersonXFill />,
+          "Cerro sesion",
+          `Esta navegando sin ingresar`
+        );
       })
       .catch((error) => {
         console.log(error);
       });
-  }
-  const logIn = useCallback(
-    (email, password) => {
-      const auth = getAuth();
-      signInWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
-          const [docRef, userData] = await fetchUserData(email);
-          if (userData.enabled) {
-            setUserInfo(userData);
-            setUserLogged(true);
-            setUserDocRef(docRef);
-            goToHome();
-          } else {
-            setUserInfo(genericUserData);
-            setUserLogged(false);
-            setUserDocRef(null);
-            const error = { code: "auth/account-disabled" };
-            handleLoginError(error);
-          }
-        })
-        .catch((error) => {
-          handleLoginError(error);
-          setUserInfo(genericUserData);
-          setUserLogged(false);
-          console.log(error);
-        });
-    },
-    [fetchUserData]
-  );
+  };
   useEffect(() => {
-    if (isUserLogged) {
-      console.log(isUserLogged);
-      Promise.all([fetchCompanyInfo(), fetchCategories(), fetchDeveloperData()])
-        .then(([info, cats, devData]) => {
-          setCompanyInfo(info);
-          setNavCat(cats);
-          setDeveloperData(devData);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-          // You might also want to set an error state here to display an error message
-        });
-    }
-  }, [isUserLogged]);
+    Promise.all([fetchCompanyInfo(), fetchCategories(), fetchDeveloperData()])
+      .then(([info, cats, devData]) => {
+        setCompanyInfo(info);
+        setNavCat(cats);
+        setDeveloperData(devData);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        // You might also want to set an error state here to display an error message
+      });
+  }, []);
   useEffect(() => {
     console.log(userInfo);
     const htmlElement = document.getElementById("htmlElement");
@@ -223,7 +243,13 @@ function App() {
   }, [userInfo]);
   useEffect(() => {
     if (isUserLogged) {
-      fetchUserData(userInfo.username);
+      fetchUserData(userInfo.username).then(() => {
+        showNotification(
+          <PersonCheckFill />,
+          "Inicio de sesion",
+          `Bienvenido ${userInfo.username}`
+        );
+      });
     }
     console.log(navCat);
   }, [fetchUserData, isUserLogged, userInfo.username]);
@@ -250,59 +276,58 @@ function App() {
       >
         <CartProvider>
           <ParallaxProvider>
-            {isUserLogged && !loading && <Navigationbar />}
+            {!loading && <Navigationbar />}
             <div
               id="routerComponentOutlet"
-              style={{ minHeight: "90vh", marginTop: "50px" }}
+              style={{ marginTop: "50px", height: "100%", width: "100%" }}
             >
+              {loading && <LoadingComponent size={"lg"} text={"interfaz"} />}
               <Routes>
-                {!isUserLogged ? (
+                {!isUserLogged && (
+                  <Route
+                    path="/login"
+                    exact
+                    element={<LoginPage logIn={logIn} error={error} />}
+                  />
+                )}
+                {!loading && (
                   <>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/login" element={<LoginRedirect />} />
+                    <Route path="/aboutUs" element={<AboutUs />} />
+                    <Route path="/contact" element={<Contact />} />
+                    {isUserLogged && userInfo.status === "admin" && (
+                      <Route path="/adminPage" element={<AdminPage />} />
+                    )}
+                    <Route path="/cart" element={<Cart />} />
                     <Route
-                      path="/login"
-                      element={<LoginPage logIn={logIn} error={error} />}
+                      path="/category/:idCat"
+                      element={<ItemListContainer />}
                     />
-                    <Route path="*" element={<NotLoginRedirect />} />
+                    <Route path="/category/" element={<ItemListContainer />} />
+                    <Route
+                      path="/product/:idProd"
+                      element={<ItemDetailContainer />}
+                    />
+                    <Route path="/order/:idOrder" element={<Order />} />
+                    <Route path="/orders" element={<OrdersContainer />} />
+                    {isUserLogged && (
+                      <>
+                        <Route path="/user/" element={<User />} />
+                        <Route
+                          path="/user/favorites"
+                          element={<FavoritesListContainer />}
+                        />
+                        <Route path="/user/myOrders" element={<UserOrders />} />
+                        <Route path="/user/settings" element={<User />} />
+                      </>
+                    )}
+                    <Route path="*" element={<NotFound />} />
                   </>
-                ) : (
-                  !loading && (
-                    <>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/login" element={<LoginRedirect />} />
-                      <Route path="/aboutUs" element={<AboutUs />} />
-                      <Route path="/contact" element={<Contact />} />
-                      {userInfo.status === "admin" && (
-                        <Route path="/adminPage" element={<AdminPage />} />
-                      )}
-                      <Route path="/cart" element={<Cart />} />
-                      <Route
-                        path="/category/:idCat"
-                        element={<ItemListContainer />}
-                      />
-                      <Route
-                        path="/category/"
-                        element={<ItemListContainer />}
-                      />
-                      <Route
-                        path="/product/:idProd"
-                        element={<ItemDetailContainer />}
-                      />
-                      <Route path="/order/:idOrder" element={<Order />} />
-                      <Route path="/orders" element={<OrdersContainer />} />
-                      <Route path="/user/" element={<User />} />
-                      <Route
-                        path="/user/favorites"
-                        element={<FavoritesListContainer />}
-                      />
-                      <Route path="/user/myOrders" element={<UserOrders />} />
-                      <Route path="/user/settings" element={<User />} />
-                      <Route path="*" element={<NotFound />} />
-                    </>
-                  )
                 )}
               </Routes>
             </div>
-            {isUserLogged && !loading && <Footer />}
+            {/*isUserLogged && !loading && <Footer />*/}
           </ParallaxProvider>
         </CartProvider>
       </GeneralCompany.Provider>

@@ -19,6 +19,9 @@ import {
 } from "react-bootstrap";
 import EditProductPanel from "./EditProductPanel";
 import { useMediaQuery } from "react-responsive";
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
+import testImage from "./../assets/images/testProduct.jpg";
+import LoadingComponent from "./LoadingComponent";
 
 export default function ProductListingPanel() {
   const { productCategories: categories } = useContext(GeneralCompany);
@@ -33,6 +36,33 @@ export default function ProductListingPanel() {
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [pictures, setPictures] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchProductImages(prods) {
+    setLoading(true);
+    const storage = getStorage();
+    const pictureUrls = [];
+
+    for (let product of prods) {
+      // Construct the path to the image file in Firebase Storage
+      const imagePath = `appData/productImages/${product.code}/${product.code}_1.jpg`;
+
+      // Create a reference to the file in Firebase Storage
+      const imageRef = ref(storage, imagePath);
+
+      // Get the download URL for the file
+      try {
+        const url = await getDownloadURL(imageRef);
+        pictureUrls.push(url);
+      } catch (error) {
+        console.error("Error fetching product image:", error);
+        pictureUrls.push(testImage); // Using a test image if the actual one cannot be fetched
+      }
+    }
+
+    return pictureUrls;
+  }
 
   useEffect(() => {
     fetchProducts();
@@ -48,6 +78,9 @@ export default function ProductListingPanel() {
     }));
     setProducts(prods);
     setDisplayedProducts(prods);
+    const pictureUrls = await fetchProductImages(prods);
+    setPictures(pictureUrls);
+    setLoading(false);
   }
 
   const handleSelectCategory = (target) => {
@@ -185,12 +218,9 @@ export default function ProductListingPanel() {
 
   const productStyle = {
     borderRadius: "var(--bs-border-radius)",
-    marginTop: "10px",
-    marginBottom: "10px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    width: "90%",
     paddingTop: isLg ? "10px" : "0",
     paddingBottom: isLg ? "10px" : "0",
   };
@@ -317,45 +347,71 @@ export default function ProductListingPanel() {
           )}
         </Row>
       )}
-      {!selectedProduct &&
-        displayedProducts.map((product) => (
-          <Row key={product.id} style={productStyle}>
-            <Col xs={12} lg={2}>
-              <img
-                src={new URL(product.picture[0], import.meta.url).href}
-                alt={product.title}
-                style={{ height: "100px", width: "auto" }}
-              />
-            </Col>
-            <Col
-              xs={12}
-              lg={5}
+      {!selectedProduct ? (
+        displayedProducts.map((product, index) => (
+          <div
+            style={{
+              position: "relative",
+              height: "100%",
+              marginTop: "5px",
+              marginBottom: "5px",
+              borderRadius: "var(--bs-border-radius)",
+            }}
+          >
+            {loading && <LoadingComponent text={"producto"} />}
+            <Row
+              key={product.id}
               style={{
-                marginTop: isLg ? "10px" : "0",
-                marginBottom: isLg ? "10px" : "0",
+                ...productStyle,
+                visibility: loading ? "hidden" : "visible",
               }}
             >
-              <h5 style={{ margin: 0 }}>{product.title}</h5>
-              <p style={{ margin: 0 }}>Código: {product.code}</p>
-            </Col>
-            <Col
-              xs={12}
-              as={Row}
-              lg={5}
-              className="text-center d-flex justify-content-center"
-            >
-              <Col xs={6} lg={"auto"}>
-                <Button onClick={() => handleModify(product)}>Modificar</Button>
+              <Col xs={12} lg={2}>
+                <img
+                  src={
+                    pictures[index] !== null && pictures[index] !== undefined
+                      ? pictures[index]
+                      : testImage
+                  }
+                  alt={product.title}
+                  style={{ height: "100px", width: "auto" }}
+                />
               </Col>
-              <Col xs={6} lg={"auto"}>
-                <Button variant="danger" onClick={() => handleDelete(product)}>
-                  Eliminar
-                </Button>
+              <Col
+                xs={12}
+                lg={5}
+                style={{
+                  marginTop: isLg ? "10px" : "0",
+                  marginBottom: isLg ? "10px" : "0",
+                }}
+              >
+                <h5 style={{ margin: 0 }}>{product.title}</h5>
+                <p style={{ margin: 0 }}>Código: {product.code}</p>
               </Col>
-            </Col>
-          </Row>
-        ))}
-      {selectedProduct && (
+              <Col
+                xs={12}
+                as={Row}
+                lg={5}
+                className="text-center d-flex justify-content-center"
+              >
+                <Col xs={6} lg={"auto"}>
+                  <Button onClick={() => handleModify(product)}>
+                    Modificar
+                  </Button>
+                </Col>
+                <Col xs={6} lg={"auto"}>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDelete(product)}
+                  >
+                    Eliminar
+                  </Button>
+                </Col>
+              </Col>
+            </Row>
+          </div>
+        ))
+      ) : (
         <EditProductPanel
           product={selectedProduct}
           productChange={handleProductChange}

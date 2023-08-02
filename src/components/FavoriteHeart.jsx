@@ -1,25 +1,36 @@
 import { useContext, useState } from "react";
-import { Heart, HeartFill } from "react-bootstrap-icons";
+import { Heart, HeartFill, PersonXFill } from "react-bootstrap-icons";
 import { GeneralCompany } from "../App";
 import { Toast, ToastContainer } from "react-bootstrap";
 import { showNotification } from "./ToastNotification";
 
 export default function FavoriteHeart(props) {
-  const { setUserFavorites: setUserFavorites, userFavorites: favorites } =
-    useContext(GeneralCompany);
+  const {
+    setUserFavorites: setUserFavorites,
+    userFavorites: favorites,
+    isUserLogged: isUserLogged,
+  } = useContext(GeneralCompany);
   const [showToast, setShowToast] = useState(false);
   function changeFavoriteStatus() {
-    let updatedFavorites;
-    if (favorites.includes(props.productCode)) {
-      updatedFavorites = favorites.filter(
-        (favCode) => favCode !== props.productCode
-      );
-      showNotification(<HeartFill />, "Favorites", "Removed from favorites");
+    if (isUserLogged) {
+      let updatedFavorites;
+      if (favorites.includes(props.productCode)) {
+        updatedFavorites = favorites.filter(
+          (favCode) => favCode !== props.productCode
+        );
+        showNotification(<HeartFill />, "Favorites", "Eliminado de Favoritos");
+      } else {
+        updatedFavorites = [...favorites, props.productCode];
+        showNotification(<HeartFill />, "Favorites", "Agregado a Favoritos");
+      }
+      setUserFavorites(updatedFavorites);
     } else {
-      updatedFavorites = [...favorites, props.productCode];
-      showNotification(<HeartFill />, "Favorites", "Added to favorites");
+      showNotification(
+        <PersonXFill />,
+        "Inicie sesion",
+        "Requiere iniciar sesion"
+      );
     }
-    setUserFavorites(updatedFavorites);
   }
   return (
     <>

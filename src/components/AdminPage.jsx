@@ -6,10 +6,11 @@ import ProductsPanel from "./ProductsPanel";
 import UserPanel from "./UserPanel";
 import OrderPanel from "./OrderPanel";
 import SalesPanel from "./SalesPanel";
+import ContactPanel from "./ContactPanel";
 
 export default function AdminPage() {
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
-  const [activeTab, setActiveTab] = useState("sales");
+  const [activeTab, setActiveTab] = useState("contact");
   return (
     <Tab.Container
       className="d-flex justify-content-center align-items-center"
@@ -128,7 +129,7 @@ export default function AdminPage() {
               }`}
               style={{ marginTop: "25px", marginBottom: "25px" }}
             >
-              Pestaña Contacto
+              <ContactPanel />
             </Tab.Pane>
             <Tab.Pane
               eventKey="config"

@@ -124,9 +124,10 @@ function LoginPage(props) {
   return (
     <Container
       className="d-flex align-items-center justify-content-center flex-column text-center"
-      style={{ minHeight: "100vh" }}
+      style={{ height: "100%", width: "100%", marginTop: "-50px" }}
     >
       <Row
+        className="d-flex align-items-center justify-content-center flex-column text-center"
         style={{
           color: "var(--bs-body-color)",
           backgroundColor: "var(--bs-dark-bg-subtle)",
@@ -137,7 +138,7 @@ function LoginPage(props) {
           width: "75%",
         }}
       >
-        <Col>
+        <Col className="d-flex align-items-center justify-content-center flex-column text-center">
           <Row className="d-flex align-items-center justify-content-center text-center">
             <Col xs={12} as={Row}>
               <Col xs={12}>

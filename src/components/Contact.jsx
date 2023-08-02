@@ -10,6 +10,8 @@ import {
   Whatsapp,
 } from "react-bootstrap-icons";
 import ContactForm from "./ContactForm";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
+import formatDateAndTime, { formatNewDate } from "../tools/formatDate";
 
 export default function Contact() {
   const { companyInfo: compInfo } = useContext(GeneralCompany);
@@ -17,7 +19,33 @@ export default function Contact() {
     compInfo.companyContactInfo
   );
   function sendFormEvent(form) {
-    console.log(form);
+    // Get the reference to the "contactMessages" collection in Firebase
+    const db = getFirestore();
+    const messagesRef = collection(db, "contactMessages");
+
+    // Create the data object to be uploaded
+    const data = {
+      name: form.name,
+      lastName: form.lastName,
+      email: form.email,
+      phone: form.phone,
+      subject: form.subject,
+      message: form.message,
+      readed: false, // By default, it's false
+      resolved: false, // By default, it's false
+      createdOn: formatNewDate(), // Set the current date and time of the upload
+    };
+
+    // Add the data to the "contactMessages" collection
+    addDoc(messagesRef, data)
+      .then((docRef) => {
+        console.log("Document written with ID: ", docRef.id);
+        // You can perform additional actions after successfully uploading the data if needed
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+        // Handle the error if the data upload fails
+      });
   }
   function handleContactButton(evt) {
     const key = evt.target.getAttribute("data-key");
@@ -65,6 +93,7 @@ export default function Contact() {
           style={{
             backgroundColor: "var(--bs-dark-bg-subtle)",
             borderRadius: "var(--bs-border-radius)",
+            marginTop: "10px",
           }}
         >
           <Col xs={10}>
@@ -77,8 +106,10 @@ export default function Contact() {
         <Col
           as={Row}
           xs={12}
-          lg={4}
           className="d-flex align-items-center justify-content-center text-center"
+          style={{
+            marginTop: "10px",
+          }}
         >
           <Col xs={12}>
             <h3>Seguinos en</h3>

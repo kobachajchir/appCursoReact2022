@@ -21,24 +21,17 @@ export default function NavigationBar() {
     userInfo: userInfo,
     isUserAdmin: isUserAdmin,
     setUserInfo: setUserInfo,
+    logOut: logOut,
   } = useContext(GeneralCompany);
 
   const [navbarBrand, setNavbarBrand] = useState(compInfo.companyName);
-
+  const [expanded, setExpanded] = useState(false);
   const { quantity, totalWithDiscount, validatedCoupon, priceWithCoupon } =
     useContext(CartContext);
 
   useEffect(() => setNavbarBrand(compInfo.companyName), [compInfo]);
 
-  const isLg = useMediaQuery({ query: "(max-width: 992px)" });
-
-  function logOut() {
-    setUserInfo({ ...userInfo, isUserLogged: false });
-  }
-
-  function logIn() {
-    setUserInfo({ ...userInfo, isUserLogged: true });
-  }
+  const isLg = useMediaQuery({ query: "(max-width: 991px)" });
 
   const navbarStyle = {
     backgroundColor: "var(--bs-dark-bg-subtle)",
@@ -59,7 +52,13 @@ export default function NavigationBar() {
   };
 
   return (
-    <Navbar collapseOnSelect expand="lg" fixed="top" style={navbarStyle}>
+    <Navbar
+      collapseOnSelect
+      expand="lg"
+      fixed="top"
+      style={navbarStyle}
+      expanded={expanded}
+    >
       <Container>
         <Navbar.Brand
           as={Link}
@@ -76,6 +75,7 @@ export default function NavigationBar() {
           <ThemeChanger />
         </Nav.Link>
         <Navbar.Toggle
+          onClick={() => setExpanded(expanded ? false : "expanded")}
           aria-controls="responsive-navbar-nav"
           className={`${!isLg ? "order-last" : ""}`}
         />
@@ -84,7 +84,11 @@ export default function NavigationBar() {
           className={`${!isLg ? "order-2" : ""}`}
         >
           <Nav className="me-auto">
-            <Nav.Link as={Link} to={`aboutUs/`}>
+            <Nav.Link
+              as={Link}
+              to={`aboutUs/`}
+              onClick={() => setExpanded(false)}
+            >
               Sobre nosotros
             </Nav.Link>
             <NavDropdown title="Categorias" id="collasible-nav-dropdown">
@@ -99,24 +103,37 @@ export default function NavigationBar() {
                           as={Link}
                           to={`category/${subcategory.code}`}
                           key={subcategory + index}
+                          onClick={() => setExpanded(false)}
                         >
                           {subcategory.name}
                         </NavDropdown.Item>
                       ))}
                     </>
                   ) : (
-                    <NavDropdown.Item as={Link} to={`category/${category.id}`}>
+                    <NavDropdown.Item
+                      as={Link}
+                      to={`category/${category.id}`}
+                      onClick={() => setExpanded(false)}
+                    >
                       {category.name}
                     </NavDropdown.Item>
                   )}
                 </div>
               ))}
               <NavDropdown.Divider />
-              <NavDropdown.Item as={Link} to={`category/`}>
+              <NavDropdown.Item
+                as={Link}
+                to={`category/`}
+                onClick={() => setExpanded(false)}
+              >
                 Todos los productos
               </NavDropdown.Item>
             </NavDropdown>
-            <Nav.Link as={Link} to={`contact/`}>
+            <Nav.Link
+              as={Link}
+              to={`contact/`}
+              onClick={() => setExpanded(false)}
+            >
               Contacto
             </Nav.Link>
           </Nav>
@@ -126,6 +143,7 @@ export default function NavigationBar() {
                 as={Link}
                 to={"/adminPage"}
                 className="d-flex align-items-center"
+                onClick={() => setExpanded(false)}
               >
                 {!isLg ? <Building /> : "Administracion"}
               </Nav.Link>
@@ -137,30 +155,45 @@ export default function NavigationBar() {
             >
               {!isUserLogged ? (
                 <>
-                  <NavDropdown.Item
-                    as={Link}
-                    to={`/user/login`}
-                    onClick={logIn}
-                  >
+                  <NavDropdown.Item as={Link} to={`/login`}>
                     Iniciar sesion
                   </NavDropdown.Item>
                 </>
               ) : (
                 <>
-                  <NavDropdown.Item style={{ pointerEvents: "none" }}>
+                  <NavDropdown.Item
+                    style={{ pointerEvents: "none" }}
+                    onClick={() => setExpanded(false)}
+                  >
                     Hola <strong>{userInfo.username}</strong>!
                   </NavDropdown.Item>
                   <NavDropdown.Divider />
-                  <NavDropdown.Item as={Link} to={`/user`}>
+                  <NavDropdown.Item
+                    as={Link}
+                    to={`/user`}
+                    onClick={() => setExpanded(false)}
+                  >
                     Mi perfil
                   </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to={`/user/favorites`}>
+                  <NavDropdown.Item
+                    as={Link}
+                    to={`/user/favorites`}
+                    onClick={() => setExpanded(false)}
+                  >
                     Favoritos
                   </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to={`/user/myOrders`}>
+                  <NavDropdown.Item
+                    as={Link}
+                    to={`/user/myOrders`}
+                    onClick={() => setExpanded(false)}
+                  >
                     Mis compras
                   </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to={`/user/settings`}>
+                  <NavDropdown.Item
+                    as={Link}
+                    to={`/user/settings`}
+                    onClick={() => setExpanded(false)}
+                  >
                     Configuracion
                   </NavDropdown.Item>
                   <NavDropdown.Divider />
@@ -174,6 +207,7 @@ export default function NavigationBar() {
               as={Link}
               to={"/cart"}
               className="d-flex align-items-center"
+              onClick={() => setExpanded(false)}
             >
               {!isLg ? <CartFill className="order-1" /> : "Carrito"}
               {quantity > 0 && (

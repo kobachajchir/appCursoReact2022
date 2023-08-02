@@ -44,7 +44,7 @@ export default function FavoritesListContainer() {
     }
   }, [favorites]);
   return (
-    <Container className="d-flex flex-column h-100 justify-content-center">
+    <Container className="d-flex flex-column justify-content-center">
       {!isEmpty ? (
         <>
           {prodList.map((product) => (
@@ -54,6 +54,7 @@ export default function FavoritesListContainer() {
               style={{
                 height: !isLg ? "25vh" : "unset",
                 width: "auto",
+                marginTop: "10px",
               }}
             >
               <FavoriteItem item={product} index={product.id} />

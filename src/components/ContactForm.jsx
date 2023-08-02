@@ -7,6 +7,7 @@ export default function ContactForm(props) {
     lastName: "",
     email: "",
     phone: "",
+    subject: "",
     message: "",
   });
   const textAreaRef = useRef(null);
@@ -23,6 +24,7 @@ export default function ContactForm(props) {
       form.lastName === "" ||
       form.email === "" ||
       form.phone === "" ||
+      form.subject === "" ||
       form.message === ""
     ) {
       if (!disabledSend) {
@@ -46,6 +48,7 @@ export default function ContactForm(props) {
       lastName: "",
       email: "",
       phone: "",
+      subject: "",
       message: "",
     });
     if (textAreaRef.current) {
@@ -76,6 +79,7 @@ export default function ContactForm(props) {
     border: "none",
     fontSize: "1.25rem",
     padding: "5px",
+    width: "100%",
   };
   useEffect(() => {
     checkIfAllFilled();
@@ -136,12 +140,25 @@ export default function ContactForm(props) {
           </Row>
           <Row className="d-flex align-items-center justify-content-center text-center">
             <Col xs={12} lg={"auto"}>
+              <div className="mb-3">
+                <input
+                  name="subject"
+                  value={form.subject}
+                  onChange={handleInputChange}
+                  placeholder="Asunto"
+                  style={inputStyles}
+                />
+              </div>
+            </Col>
+          </Row>
+          <Row className="d-flex align-items-center justify-content-center text-center">
+            <Col xs={12} style={{ width: "100%" }}>
               <textarea
                 ref={textAreaRef}
                 name="message"
                 value={form.message}
                 onChange={handleInputChange}
-                rows={1}
+                rows={3}
                 placeholder="Ingrese su mensaje"
                 style={inputStyles}
               />

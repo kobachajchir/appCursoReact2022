@@ -3,14 +3,14 @@ import { Card, Button } from "react-bootstrap";
 import SaleForm from "./SaleForm";
 import { formatDate } from "../tools/formatDate";
 
-export default function SaleCard({ sale, children }) {
+export default function SaleCard({ sale, children, style }) {
   const textStyles = {
     margin: 0,
     marginTop: "5px",
     marginBottom: "5px",
   };
   return (
-    <Card>
+    <Card style={style}>
       <Card.Body>
         <>
           <Card.Title>{sale.name.toUpperCase()}</Card.Title>

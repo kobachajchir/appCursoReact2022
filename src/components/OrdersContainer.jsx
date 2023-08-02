@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import OrderToTable from "./OrderToTable";
+import LoadingComponent from "./LoadingComponent";
 
 export default function OrdersContainer() {
   const [orders, setOrders] = useState([]);
@@ -75,7 +76,7 @@ export default function OrdersContainer() {
     });
 
     setOrders(ordersData);
-    setLoading(false);
+    //setLoading(false);
   };
 
   useEffect(() => {
@@ -87,18 +88,17 @@ export default function OrdersContainer() {
   }
   return (
     <>
-      <Container>
-        <Row className="justify-content-center">
-          <Col xs={12} className="text-center">
-            <h1>Orders</h1>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={12}>
-            {loading ? (
-              <h1>Loading...</h1>
-            ) : (
-              orders.map((order, index) => (
+      <Container style={{ position: "relative", height: "100%" }}>
+        {loading && <LoadingComponent text={"informacion de compra"} />}
+        <div style={{ visibility: loading ? "hidden" : "visible" }}>
+          <Row className="justify-content-center">
+            <Col xs={12} className="text-center">
+              <h1>Orders</h1>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={12}>
+              {orders.map((order, index) => (
                 <Button
                   variant="info"
                   key={`btnTo${order.id}`}
@@ -108,10 +108,10 @@ export default function OrdersContainer() {
                 >
                   Order {order.id}
                 </Button>
-              ))
-            )}
-          </Col>
-        </Row>
+              ))}
+            </Col>
+          </Row>
+        </div>
       </Container>
     </>
   );

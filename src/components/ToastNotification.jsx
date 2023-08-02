@@ -39,7 +39,7 @@ export default function ToastNotification() {
       show={showToast}
       delay={3000}
       autohide={autoHide}
-      style={{ position: "fixed", bottom: "20px", right: "20px" }}
+      style={{ position: "fixed", bottom: "40px", right: "20px" }}
     >
       <Toast.Header>
         {icon}
