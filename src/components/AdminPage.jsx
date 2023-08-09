@@ -1,15 +1,17 @@
 import { Col, Nav, Row, Tab } from "react-bootstrap";
 import { useMediaQuery } from "react-responsive";
 import CompanyDataPanel from "./CompanyDataPanel";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import ProductsPanel from "./ProductsPanel";
 import UserPanel from "./UserPanel";
 import OrderPanel from "./OrderPanel";
 import SalesPanel from "./SalesPanel";
 import ContactPanel from "./ContactPanel";
+import { GeneralCompany } from "../App";
 
 export default function AdminPage() {
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
+  const { isUserAdmin: admin } = useContext(GeneralCompany);
   const [activeTab, setActiveTab] = useState("contact");
   return (
     <Tab.Container
@@ -35,9 +37,11 @@ export default function AdminPage() {
               borderRadius: "10px",
             }}
           >
-            <Nav.Item>
-              <Nav.Link eventKey="company">Empresa</Nav.Link>
-            </Nav.Item>
+            {admin && (
+              <Nav.Item>
+                <Nav.Link eventKey="company">Empresa</Nav.Link>
+              </Nav.Item>
+            )}
             <Nav.Item>
               <Nav.Link eventKey="products">Productos</Nav.Link>
             </Nav.Item>
@@ -47,15 +51,19 @@ export default function AdminPage() {
             <Nav.Item>
               <Nav.Link eventKey="orders">Ventas</Nav.Link>
             </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="users">Usuarios</Nav.Link>
-            </Nav.Item>
+            {admin && (
+              <Nav.Item>
+                <Nav.Link eventKey="users">Usuarios</Nav.Link>
+              </Nav.Item>
+            )}
             <Nav.Item>
               <Nav.Link eventKey="contact">Contacto</Nav.Link>
             </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="config">Configuracion</Nav.Link>
-            </Nav.Item>
+            {admin && (
+              <Nav.Item>
+                <Nav.Link eventKey="config">Configuracion</Nav.Link>
+              </Nav.Item>
+            )}
           </Nav>
         </Col>
         <Col

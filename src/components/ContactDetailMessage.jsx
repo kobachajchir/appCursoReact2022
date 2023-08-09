@@ -1,7 +1,17 @@
 import { updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Col, Container, Row, Button } from "react-bootstrap";
-import { ArrowLeft } from "react-bootstrap-icons";
+import {
+  ArrowLeft,
+  At,
+  BellFill,
+  CheckCircle,
+  CheckCircleFill,
+  EnvelopeFill,
+  EnvelopeOpenFill,
+  PhoneFill,
+  TelephoneFill,
+} from "react-bootstrap-icons";
 
 function ContactDetailMessage({
   message,
@@ -66,58 +76,113 @@ function ContactDetailMessage({
   }, []);
   return (
     <Container fluid>
-      <Row>
+      <Row style={{ marginTop: "10px", marginBottom: "10px" }}>
         <Col xs={12}>
-          <label>Fecha: {localMessage.createdOn}</label>
+          <h3>{localMessage.subject}</h3>
         </Col>
         <Col xs={12}>
-          <label>Asunto: {localMessage.subject}</label>
-        </Col>
-        <Col xs={12}>
-          <label>Nombre: {localMessage.name}</label>
-        </Col>
-        <Col xs={12}>
-          <label>Apellido: {localMessage.lastName}</label>
-        </Col>
-        <Col xs={12}>
-          <label>Email: {localMessage.email}</label>
-        </Col>
-        <Col xs={12}>
-          <label>Teléfono: {localMessage.phone}</label>
-        </Col>
-        <Col xs={12}>
-          <label>Mensaje: {localMessage.message}</label>
+          <h6>{localMessage.createdOn}</h6>
         </Col>
       </Row>
-      <Row>
-        <Col xs={6}>
-          <Button variant="primary" onClick={handleSetReaded}>
-            {localMessage.readed ? "Set as Unreaded" : "Set as Readed"}
-          </Button>
+      <Row style={{ marginTop: "10px", marginBottom: "10px" }}>
+        <Col xs={12}>
+          <label>
+            <strong>Mensaje de:</strong> {localMessage.name}{" "}
+            {localMessage.lastName}
+          </label>
         </Col>
-        <Col xs={6}>
-          <Button variant="primary" onClick={handleSetResolved}>
-            {localMessage.resolved ? "Set as unresolved" : "Set as resolved"}
+        <Col xs={12}>
+          <label>
+            <strong>Email: </strong>
+            {localMessage.email}
+          </label>
+        </Col>
+        <Col xs={12}>
+          <label>
+            <strong>Teléfono: </strong>
+            {localMessage.phone}
+          </label>
+        </Col>
+      </Row>
+      <Row style={{ marginTop: "10px", marginBottom: "10px" }}>
+        <Col xs={12}>
+          <label>{localMessage.message}</label>
+        </Col>
+      </Row>
+      <Row style={{ marginTop: "10px", marginBottom: "10px" }}>
+        <Col className="d-flex justify-content-center">
+          <Button
+            variant="primary"
+            onClick={handleSetReaded}
+            style={{ marginLeft: "5px", marginRight: "5px" }}
+            className="d-flex align-items-center"
+          >
+            {localMessage.readed
+              ? "Marcar como no leido "
+              : "Marcar como leido "}
+            {localMessage.readed ? (
+              <EnvelopeFill
+                size={20}
+                style={{ marginLeft: "2.5px", marginRight: "2.5px" }}
+              />
+            ) : (
+              <EnvelopeOpenFill
+                size={20}
+                style={{ marginLeft: "2.5px", marginRight: "2.5px" }}
+              />
+            )}
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleSetResolved}
+            style={{ marginLeft: "5px", marginRight: "5px" }}
+            className="d-flex align-items-center"
+          >
+            {localMessage.resolved
+              ? "Marcar como no resuelto "
+              : "Marcar como resuelto "}
+            {localMessage.resolved ? (
+              <CheckCircle
+                size={20}
+                style={{ marginLeft: "2.5px", marginRight: "2.5px" }}
+              />
+            ) : (
+              <CheckCircleFill
+                size={20}
+                style={{ marginLeft: "2.5px", marginRight: "2.5px" }}
+              />
+            )}
           </Button>
         </Col>
       </Row>
-      <Row>
+      <Row style={{ marginTop: "10px", marginBottom: "10px" }}>
         <Col xs={12}>
           <h4>Contactar por:</h4>
         </Col>
-        <Col xs={4}>
-          <Button variant="info" onClick={handleContactByNotification}>
-            Notificación
+        <Col className="d-flex flex-row align-items-center text-center justify-content-center">
+          <Button
+            variant="info"
+            onClick={handleContactByNotification}
+            style={{ marginLeft: "5px", marginRight: "5px" }}
+            className="d-flex align-items-center"
+          >
+            <BellFill size={20} />
           </Button>
-        </Col>
-        <Col xs={4}>
-          <Button variant="info" onClick={handleContactByEmail}>
-            Email
+          <Button
+            variant="info"
+            onClick={handleContactByEmail}
+            style={{ marginLeft: "5px", marginRight: "5px" }}
+            className="d-flex align-items-center"
+          >
+            <At size={20} />
           </Button>
-        </Col>
-        <Col xs={4}>
-          <Button variant="info" onClick={handleContactByPhone}>
-            Teléfono
+          <Button
+            variant="info"
+            onClick={handleContactByPhone}
+            style={{ marginLeft: "5px", marginRight: "5px" }}
+            className="d-flex align-items-center"
+          >
+            <TelephoneFill size={20} />
           </Button>
         </Col>
       </Row>

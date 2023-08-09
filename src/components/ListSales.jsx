@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Button, Col } from "react-bootstrap";
+import { Container, Row, Button, Col, Carousel } from "react-bootstrap";
 import { collection, getDocs, getFirestore } from "firebase/firestore";
 import SaleCard from "./SaleCard";
 import CouponCard from "./CouponCard";
@@ -7,41 +7,23 @@ import CouponForm from "./CouponForm";
 import SaleForm from "./SaleForm";
 import LoadingComponent from "./LoadingComponent";
 
-export default function ListSales() {
-  const [sales, setSales] = useState([]);
-  const [coupons, setCoupons] = useState([]);
+export default function ListSales({
+  sales,
+  coupons,
+  refreshCoupons,
+  refreshSales,
+  refreshCouponsFn,
+  refreshSalesFn,
+}) {
   const [selectedSale, setSelectedSale] = useState(null);
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [isEditingSale, setIsEditingSale] = useState(false);
   const [isEditingCoupon, setIsEditingCoupon] = useState(false);
   const [loading, setLoading] = useState(true);
-  const db = getFirestore();
-
-  const fetchSales = async () => {
-    const data = await getDocs(collection(db, "sales"));
-    return data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-  };
-
-  const fetchCoupons = async () => {
-    const data = await getDocs(collection(db, "coupons"));
-    return data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-  };
 
   useEffect(() => {
-    Promise.all([fetchSales(), fetchCoupons()]).then(([sales, coupons]) => {
-      setSales(sales);
-      setCoupons(coupons);
-      setLoading(false);
-    });
-  }, []);
-
-  useEffect(() => {
-    fetchSales().then(setSales);
-  }, [isEditingSale]);
-
-  useEffect(() => {
-    fetchCoupons().then(setCoupons);
-  }, [isEditingCoupon]);
+    setLoading(false);
+  }, [sales, coupons]);
 
   const handleModifySale = (saleId) => {
     setSelectedSale(sales.find((sale) => saleId === sale.id));
@@ -53,17 +35,22 @@ export default function ListSales() {
     setIsEditingCoupon(true);
   };
 
-  const handleFormSubmit = () => {
-    setIsEditingSale(false);
+  const handleFormCouponSubmit = () => {
     setIsEditingCoupon(false);
-    setSelectedSale(null);
     setSelectedCoupon(null);
+    refreshCouponsFn(true);
+  };
+
+  const handleFormSaleSubmit = () => {
+    setIsEditingSale(false);
+    setSelectedSale(null);
+    refreshSalesFn(true);
   };
 
   const saleForm = isEditingSale && selectedSale && (
     <SaleForm
       sale={selectedSale}
-      onSubmit={handleFormSubmit}
+      onSubmit={handleFormSaleSubmit}
       onClose={() => setIsEditingSale(false)}
     />
   );
@@ -71,7 +58,7 @@ export default function ListSales() {
   const couponForm = isEditingCoupon && selectedCoupon && (
     <CouponForm
       coupon={selectedCoupon}
-      onSubmit={handleFormSubmit}
+      onSubmit={handleFormCouponSubmit}
       onClose={() => setIsEditingCoupon(false)}
     />
   );
@@ -110,25 +97,31 @@ export default function ListSales() {
             ) : loading ? (
               <LoadingComponent text={"ofertas"} />
             ) : (
-              sales.map((sale) => (
-                <div
-                  key={sale.id}
-                  style={{
-                    marginLeft: "5px",
-                    marginRight: "5px",
-                    visibility: loading ? "hidden" : "visible",
-                  }}
-                >
-                  <SaleCard sale={sale}>
-                    <Button
-                      variant="primary"
-                      onClick={() => handleModifySale(sale.id)}
+              <Carousel indicators={false} slide={false} interval={null}>
+                {sales.map((sale, index) => (
+                  <Carousel.Item key={sale.id}>
+                    <div
+                      style={{
+                        marginLeft: "5px",
+                        marginRight: "5px",
+                        visibility: loading ? "hidden" : "visible",
+                      }}
                     >
-                      Modificar
-                    </Button>
-                  </SaleCard>
-                </div>
-              ))
+                      <SaleCard
+                        sale={sale}
+                        style={{ backgroundColor: "var(--bs-dark-bg-subtle)" }}
+                      >
+                        <Button
+                          variant="primary"
+                          onClick={() => handleModifySale(sale.id)}
+                        >
+                          Modificar
+                        </Button>
+                      </SaleCard>
+                    </div>
+                  </Carousel.Item>
+                ))}
+              </Carousel>
             )}
           </Col>
         </Row>
@@ -166,25 +159,31 @@ export default function ListSales() {
             ) : loading ? (
               <LoadingComponent text={"cupones"} />
             ) : (
-              coupons.map((coupon) => (
-                <div
-                  key={coupon.id}
-                  style={{
-                    marginLeft: "5px",
-                    marginRight: "5px",
-                    visibility: loading ? "hidden" : "visible",
-                  }}
-                >
-                  <CouponCard coupon={coupon}>
-                    <Button
-                      variant="primary"
-                      onClick={() => handleModifyCoupon(coupon.id)}
+              <Carousel indicators={false} slide={false} interval={null}>
+                {coupons.map((coupon, index) => (
+                  <Carousel.Item key={coupon.id}>
+                    <div
+                      style={{
+                        marginLeft: "5px",
+                        marginRight: "5px",
+                        visibility: loading ? "hidden" : "visible",
+                      }}
                     >
-                      Modificar
-                    </Button>
-                  </CouponCard>
-                </div>
-              ))
+                      <CouponCard
+                        coupon={coupon}
+                        style={{ backgroundColor: "var(--bs-dark-bg-subtle)" }}
+                      >
+                        <Button
+                          variant="primary"
+                          onClick={() => handleModifyCoupon(coupon.id)}
+                        >
+                          Modificar
+                        </Button>
+                      </CouponCard>
+                    </div>
+                  </Carousel.Item>
+                ))}
+              </Carousel>
             )}
           </Col>
         </Row>

@@ -15,8 +15,9 @@ import LoadingComponent from "./LoadingComponent";
 function ItemDetail(props) {
   const [item, setItem] = useState(props.item);
   const [isOnSale, setIsOnSale] = useState(props.sale.isOnSale);
-  const { userFavorites: favorites } = useContext(GeneralCompany);
-  const isFavorite = favorites.includes(props.item.code);
+  const { userFavorites: favorites, isUserLogged: isUserLogged } =
+    useContext(GeneralCompany);
+  const isFavorite = isUserLogged ? favorites.includes(props.item.code) : false;
   const [saleObject, setSaleObject] = useState({});
   const [salePrice, setSalePrice] = useState("");
   const [endingDate, setEndingDate] = useState("");

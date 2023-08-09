@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, ListGroup, Row, Col } from "react-bootstrap";
 import {
+  Timestamp,
   addDoc,
   collection,
   doc,
@@ -9,13 +10,15 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
+import formatDateAndTime, { formatDate } from "../tools/formatDate";
 
 export default function SaleForm({ sale, onSubmit, onClose }) {
+  const [discountName, setDiscountName] = useState(sale ? sale.name : "");
   const [discountAvaliable, setDiscountAvailable] = useState(
     sale ? sale.discountAvaliable : 0
   );
   const [discountEnding, setDiscountEnding] = useState(
-    sale ? sale.discountEnding : ""
+    sale ? sale.discountEnding : null
   );
   const [discountPercentage, setDiscountPercentage] = useState(
     sale ? sale.discountPercentage : 0
@@ -24,29 +27,6 @@ export default function SaleForm({ sale, onSubmit, onClose }) {
     sale ? sale.productElegibles : []
   );
   const [products, setProducts] = useState([]);
-
-  const formatDate = (firebaseTimestamp) => {
-    // convert Firestore timestamp to JavaScript Date object
-    const jsDate = new Date(firebaseTimestamp.seconds * 1000);
-
-    // format date to 'YYYY-MM-DDThh:mm' format
-    const year = jsDate.getFullYear();
-    const month =
-      jsDate.getMonth() < 9
-        ? `0${jsDate.getMonth() + 1}`
-        : jsDate.getMonth() + 1; // JS months are 0-indexed
-    const day =
-      jsDate.getDate() < 10 ? `0${jsDate.getDate()}` : jsDate.getDate();
-    const hours =
-      jsDate.getHours() < 10 ? `0${jsDate.getHours()}` : jsDate.getHours();
-    const minutes =
-      jsDate.getMinutes() < 10
-        ? `0${jsDate.getMinutes()}`
-        : jsDate.getMinutes();
-    const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
-
-    return formattedDate;
-  };
 
   const db = getFirestore();
   const fetchProducts = async () => {
@@ -64,8 +44,9 @@ export default function SaleForm({ sale, onSubmit, onClose }) {
   useEffect(() => {
     if (sale) {
       console.log(sale);
+      setDiscountName(sale.name);
       setDiscountAvailable(sale.discountAvaliable);
-      setDiscountEnding(sale.discountEnding);
+      setDiscountEnding(formatDateAndTime(sale.discountEnding));
       setDiscountPercentage(sale.discountPercentage);
       setSelectedProducts(sale.productElegibles);
     }
@@ -84,24 +65,29 @@ export default function SaleForm({ sale, onSubmit, onClose }) {
   };
 
   const handleSaleSubmit = async () => {
+    const discountEndingDate = new Date(discountEnding);
+    const discountEndingTimestamp = Timestamp.fromDate(discountEndingDate);
     try {
       if (sale) {
         await updateDoc(doc(db, "sales", sale.id), {
+          name: discountName,
           discountAvaliable,
-          discountEnding,
+          discountEnding: discountEndingTimestamp,
           discountPercentage,
           productElegibles: selectedProducts,
         });
         console.log("Sale document updated with ID: ", sale.id);
       } else {
         const docRef = await addDoc(collection(db, "sales"), {
+          name: discountName,
           discountAvaliable,
-          discountEnding,
+          discountEnding: discountEndingTimestamp,
           discountPercentage,
           productElegibles: selectedProducts,
         });
         console.log("Sale document written with ID: ", docRef.id);
       }
+      setDiscountName("");
       setDiscountAvailable(0);
       setDiscountEnding("");
       setDiscountPercentage(0);
@@ -131,6 +117,16 @@ export default function SaleForm({ sale, onSubmit, onClose }) {
         </Button>
       )}
       <Form>
+        <Form.Group controlId="formDiscountName">
+          <Form.Label style={labelStyles}>Nombre del descuento</Form.Label>
+          <Form.Control
+            style={inputStyles}
+            type="text"
+            value={discountName}
+            onChange={(e) => setDiscountName(e.target.value)}
+            required
+          />
+        </Form.Group>
         <Form.Group controlId="formDiscountPercentage">
           <Form.Label style={labelStyles}>Porcentaje de descuento</Form.Label>
           <Form.Control
@@ -161,7 +157,7 @@ export default function SaleForm({ sale, onSubmit, onClose }) {
           <Form.Control
             style={inputStyles}
             type="datetime-local"
-            value={formatDate(discountEnding)}
+            defaultValue={discountEnding}
             onChange={(e) => setDiscountEnding(e.target.value)}
             required
           />

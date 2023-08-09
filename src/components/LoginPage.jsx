@@ -6,8 +6,11 @@ import {
   Facebook,
   Star,
   XOctagonFill,
+  PersonXFill,
 } from "react-bootstrap-icons";
 import LoginErrorBanner from "./LoginErrorBanner";
+import { useLocation, useNavigate } from "react-router-dom";
+import { showNotification } from "./ToastNotification";
 
 function LoginPage(props) {
   const [email, setEmail] = useState("");
@@ -20,6 +23,9 @@ function LoginPage(props) {
   const [noUser, setNoUser] = useState(false);
   const [tooManyAttempts, setTooManyAttempts] = useState(false);
   const [accountDisabled, setAccountDisabled] = useState(false);
+  const [loginTry, setLoginTry] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleMouseEnter = (evt) => {
     setBgColor(evt.target.getAttribute("data-bgcolor"));
@@ -63,8 +69,17 @@ function LoginPage(props) {
       return;
     }
 
-    await props.logIn(email, password);
+    const isSuccess = await props.logIn(email, password);
+
+    if (isSuccess) {
+      if (location.state && location.state.redirectTo) {
+        navigate(`${location.state.redirectTo}`);
+      } else {
+        navigate("/"); // Or any default route you want
+      }
+    }
   }
+
   const inputStyles = {
     color: "var(--bs-body-color)",
     backgroundColor: "var(--bs-secondary-bg)",
@@ -118,7 +133,7 @@ function LoginPage(props) {
         setTooManyAttempts(false);
         setAccountDisabled(true);
       }
-      reset();
+      setLoginTry(false);
     }
   }, [props.error]);
   return (
@@ -316,33 +331,41 @@ function LoginPage(props) {
           </Row>
         </Col>
       </Row>
-      {noUser && (
-        <LoginErrorBanner>
-          <p>No se encontro usuario</p>
-        </LoginErrorBanner>
-      )}
-      {wrongPass && (
-        <LoginErrorBanner>
-          <p>Contraseña incorrecta</p>
-        </LoginErrorBanner>
-      )}
-      {tooManyAttempts && (
-        <LoginErrorBanner>
-          <p style={{ margin: 0 }}>Demasiados intentos incorrectos</p>
-          <p style={{ margin: 0 }}>
-            Debes cambiar la contraseña, haz click para enviar el correo de
-            restablecimiento
-          </p>
-          <Col xs={12} style={{ marginTop: "10px" }}>
-            <Button variant="secondary">Restablecer contraseña</Button>
-          </Col>
-        </LoginErrorBanner>
-      )}
-      {accountDisabled && (
-        <LoginErrorBanner>
-          <p>La cuenta esta deshabilitada</p>
-        </LoginErrorBanner>
-      )}
+      {noUser &&
+        showNotification(
+          <PersonXFill />,
+          "Error de inicio de sesion",
+          `No hay cuenta asociada a ${email}`
+        )}
+      {wrongPass &&
+        showNotification(
+          <PersonXFill />,
+          "Error de inicio de sesion",
+          `Contraseña incorrecta`
+        )}
+      {tooManyAttempts &&
+        showNotification(
+          <PersonXFill />,
+          "Demasiados intentos incorrectos",
+          ``
+        ) && (
+          <LoginErrorBanner>
+            <p style={{ margin: 0 }}>Demasiados intentos incorrectos</p>
+            <p style={{ margin: 0 }}>
+              Debes cambiar la contraseña, haz click para enviar el correo de
+              restablecimiento
+            </p>
+            <Col xs={12} style={{ marginTop: "10px" }}>
+              <Button variant="secondary">Restablecer contraseña</Button>
+            </Col>
+          </LoginErrorBanner>
+        )}
+      {accountDisabled &&
+        showNotification(
+          <PersonXFill />,
+          "Error de inicio de sesion",
+          `Esta cuenta esta deshabilitada`
+        )}
     </Container>
   );
 }

@@ -22,6 +22,8 @@ import CartItemActions from "./CartItemActions";
 import CheckOut from "./Checkout";
 import GoHomeButton from "./GoHomeButton";
 import { useMediaQuery } from "react-responsive";
+import { GeneralCompany } from "../App";
+import LoginButton from "./LoginButton";
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -43,6 +45,7 @@ export default function Cart() {
   const [coupon, setCoupon] = useState("");
   const db = getFirestore();
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
+  const { isUserLogged: isUserLogged } = useContext(GeneralCompany);
   useEffect(() => {}, []);
   function createOrder() {
     let orderId;
@@ -223,7 +226,11 @@ export default function Cart() {
                         !isLg ? "d-flex justify-content-start" : ""
                       }`}
                     >
-                      <CheckOut onClick={createOrder} />
+                      {isUserLogged ? (
+                        <CheckOut onClick={createOrder} />
+                      ) : (
+                        <LoginButton />
+                      )}
                     </Col>
                   </Row>
                 </Col>

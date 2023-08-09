@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Card, Button } from "react-bootstrap";
 import CouponForm from "./CouponForm";
 
-export default function CouponCard({ coupon, children }) {
+export default function CouponCard({ coupon, children, style }) {
   const textStyles = {
     margin: 0,
     marginTop: "5px",
     marginBottom: "5px",
   };
   return (
-    <Card>
+    <Card style={style}>
       <Card.Body>
         <>
           <Card.Title>{coupon.code}</Card.Title>

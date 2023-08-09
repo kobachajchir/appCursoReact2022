@@ -4,15 +4,15 @@ import { collection, getDocs, getFirestore } from "firebase/firestore";
 import SaleForm from "./SaleForm";
 import CouponForm from "./CouponForm";
 
-export default function AddSalesPanel() {
+export default function AddSalesPanel({ addedCoupon, addedSale }) {
   return (
     <Container>
       <Tabs defaultActiveKey="coupon" id="uncontrolled-tab-example">
         <Tab eventKey="coupon" title="Agregar cupon">
-          <CouponForm />
+          <CouponForm onSubmit={() => addedCoupon(true)} />
         </Tab>
         <Tab eventKey="sale" title="Agregar oferta">
-          <SaleForm />
+          <SaleForm onSubmit={() => addedSale(true)} />
         </Tab>
       </Tabs>
     </Container>

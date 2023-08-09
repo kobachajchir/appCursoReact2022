@@ -1,12 +1,50 @@
 import { Col, Nav, Row, Tab } from "react-bootstrap";
 import AddSalesPanel from "./AddSalesPanel";
 import { useMediaQuery } from "react-responsive";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ListSales from "./ListSales";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
 
 export default function SalesPanel() {
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
   const [activeTab, setActiveTab] = useState("listSales");
+  const [needRefreshCoupons, setRefreshCoupons] = useState(false);
+  const [needRefreshSales, setRefreshSales] = useState(false);
+  const [sales, setSales] = useState([]);
+  const [coupons, setCoupons] = useState([]);
+  const db = getFirestore();
+
+  const fetchSales = async () => {
+    const data = await getDocs(collection(db, "sales"));
+    return data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+  };
+
+  const fetchCoupons = async () => {
+    const data = await getDocs(collection(db, "coupons"));
+    return data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+  };
+
+  useEffect(() => {
+    Promise.all([fetchSales(), fetchCoupons()]).then(([sales, coupons]) => {
+      setSales(sales);
+      setCoupons(coupons);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (needRefreshCoupons) {
+      fetchCoupons().then((coupons) => {
+        setCoupons(coupons);
+        setRefreshCoupons(false);
+      });
+    }
+    if (needRefreshSales) {
+      fetchSales().then((sales) => {
+        setSales(sales);
+        setRefreshSales(false);
+      });
+    }
+  }, [needRefreshCoupons, needRefreshSales]);
   return (
     <Tab.Container
       defaultActiveKey="company"
@@ -59,7 +97,10 @@ export default function SalesPanel() {
               }`}
               style={{ marginTop: "25px", marginBottom: "25px" }}
             >
-              <AddSalesPanel />
+              <AddSalesPanel
+                addedCoupon={setRefreshCoupons}
+                addedSale={setRefreshSales}
+              />
             </Tab.Pane>
             <Tab.Pane
               eventKey="listSales"
@@ -69,7 +110,14 @@ export default function SalesPanel() {
               }`}
               style={{ marginTop: "25px", marginBottom: "25px" }}
             >
-              <ListSales />
+              <ListSales
+                sales={sales}
+                coupons={coupons}
+                refreshCoupons={needRefreshCoupons}
+                refreshSales={needRefreshSales}
+                refreshCouponsFn={setRefreshCoupons}
+                refreshSalesFn={setRefreshSales}
+              />
             </Tab.Pane>
           </Tab.Content>
         </Col>

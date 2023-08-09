@@ -22,6 +22,7 @@ import { useMediaQuery } from "react-responsive";
 import { getDownloadURL, getStorage, ref } from "firebase/storage";
 import testImage from "./../assets/images/testProduct.jpg";
 import LoadingComponent from "./LoadingComponent";
+import ConfirmModal from "./ConfirmModal";
 
 export default function ProductListingPanel() {
   const { productCategories: categories } = useContext(GeneralCompany);
@@ -218,11 +219,12 @@ export default function ProductListingPanel() {
 
   const productStyle = {
     borderRadius: "var(--bs-border-radius)",
+    backgroundColor: "var(--bs-dark-bg-subtle)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: isLg ? "10px" : "0",
-    paddingBottom: isLg ? "10px" : "0",
+    paddingTop: "10px",
+    paddingBottom: "10px",
   };
   useEffect(() => {
     handleSearch();
@@ -230,10 +232,20 @@ export default function ProductListingPanel() {
   return (
     <>
       {!selectedProduct && (
-        <Row className="d-flex justify-content-center align-items-center flex-column">
+        <Row
+          className="d-flex justify-content-center align-items-center flex-column"
+          style={{
+            paddingTop: "10px",
+            paddingBottom: "10px",
+          }}
+        >
           <Col
             xs={12}
             className="d-flex justify-content-center align-items-center flex-column"
+            style={{
+              marginTop: "2.5px",
+              marginBottom: "2.5px",
+            }}
           >
             <FormCheck
               type="checkbox"
@@ -249,6 +261,10 @@ export default function ProductListingPanel() {
               xs={10}
               className="d-flex justify-content-center align-items-center flex-row text-center"
               as={Row}
+              style={{
+                marginTop: "10px",
+                marginBottom: "10px",
+              }}
             >
               <Col lg={8} xs={12}>
                 <FormControl
@@ -263,6 +279,10 @@ export default function ProductListingPanel() {
           <Col
             xs={12}
             className="d-flex justify-content-center align-items-center flex-column"
+            style={{
+              marginTop: "2.5px",
+              marginBottom: "2.5px",
+            }}
           >
             <FormCheck
               type="checkbox"
@@ -278,6 +298,10 @@ export default function ProductListingPanel() {
               xs={10}
               className="d-flex justify-content-center align-items-center flex-row text-center"
               as={Row}
+              style={{
+                marginTop: "10px",
+                marginBottom: "10px",
+              }}
             >
               <Col lg={8} xs={12}>
                 <FormControl
@@ -292,6 +316,10 @@ export default function ProductListingPanel() {
           <Col
             xs={12}
             className="d-flex justify-content-center align-items-center flex-column"
+            style={{
+              marginTop: "2.5px",
+              marginBottom: "2.5px",
+            }}
           >
             <FormCheck
               type="checkbox"
@@ -307,6 +335,10 @@ export default function ProductListingPanel() {
               xs={10}
               className="d-flex justify-content-center align-items-center flex-row text-center"
               as={Row}
+              style={{
+                marginTop: "10px",
+                marginBottom: "10px",
+              }}
             >
               <Col lg={8} xs={12}>
                 <FormSelect
@@ -348,69 +380,77 @@ export default function ProductListingPanel() {
         </Row>
       )}
       {!selectedProduct ? (
-        displayedProducts.map((product, index) => (
-          <div
-            style={{
-              position: "relative",
-              height: "100%",
-              marginTop: "5px",
-              marginBottom: "5px",
-              borderRadius: "var(--bs-border-radius)",
-            }}
-          >
-            {loading && <LoadingComponent text={"producto"} />}
-            <Row
+        <div
+          style={{
+            overflowY: "auto",
+            overflowX: "hidden",
+            maxHeight: "80vh",
+            padding: "5px",
+          }}
+        >
+          {displayedProducts.map((product, index) => (
+            <div
               key={product.id}
               style={{
-                ...productStyle,
-                visibility: loading ? "hidden" : "visible",
+                position: "relative",
+                marginTop: "5px",
+                marginBottom: "5px",
+                borderRadius: "var(--bs-border-radius)",
               }}
             >
-              <Col xs={12} lg={2}>
-                <img
-                  src={
-                    pictures[index] !== null && pictures[index] !== undefined
-                      ? pictures[index]
-                      : testImage
-                  }
-                  alt={product.title}
-                  style={{ height: "100px", width: "auto" }}
-                />
-              </Col>
-              <Col
-                xs={12}
-                lg={5}
+              {loading && <LoadingComponent text={"producto"} />}
+              <Row
                 style={{
-                  marginTop: isLg ? "10px" : "0",
-                  marginBottom: isLg ? "10px" : "0",
+                  ...productStyle,
+                  visibility: loading ? "hidden" : "visible",
                 }}
               >
-                <h5 style={{ margin: 0 }}>{product.title}</h5>
-                <p style={{ margin: 0 }}>Código: {product.code}</p>
-              </Col>
-              <Col
-                xs={12}
-                as={Row}
-                lg={5}
-                className="text-center d-flex justify-content-center"
-              >
-                <Col xs={6} lg={"auto"}>
-                  <Button onClick={() => handleModify(product)}>
-                    Modificar
-                  </Button>
+                <Col xs={12} lg={2}>
+                  <img
+                    src={
+                      pictures[index] !== null && pictures[index] !== undefined
+                        ? pictures[index]
+                        : testImage
+                    }
+                    alt={product.title}
+                    style={{ height: "100px", width: "auto" }}
+                  />
                 </Col>
-                <Col xs={6} lg={"auto"}>
-                  <Button
-                    variant="danger"
-                    onClick={() => handleDelete(product)}
-                  >
-                    Eliminar
-                  </Button>
+                <Col
+                  xs={12}
+                  lg={5}
+                  style={{
+                    marginTop: isLg ? "10px" : "0",
+                    marginBottom: isLg ? "10px" : "0",
+                  }}
+                >
+                  <h5 style={{ margin: 0 }}>{product.title}</h5>
+                  <p style={{ margin: 0 }}>Código: {product.code}</p>
                 </Col>
-              </Col>
-            </Row>
-          </div>
-        ))
+                <Col
+                  xs={12}
+                  as={Row}
+                  lg={5}
+                  className="text-center d-flex justify-content-center"
+                >
+                  <Col xs={6} lg={"auto"}>
+                    <Button onClick={() => handleModify(product)}>
+                      Modificar
+                    </Button>
+                  </Col>
+                  <Col xs={6} lg={"auto"}>
+                    <Button
+                      variant="danger"
+                      onClick={() => handleDelete(product)}
+                    >
+                      Eliminar
+                    </Button>
+                  </Col>
+                </Col>
+              </Row>
+            </div>
+          ))}
+        </div>
       ) : (
         <EditProductPanel
           product={selectedProduct}
@@ -418,23 +458,14 @@ export default function ProductListingPanel() {
           onClose={handleProductPanelClose}
         />
       )}
-      <Modal show={isDeleteDialogOpen} onHide={cancelDelete}>
-        <Modal.Header closeButton={false}>
-          <Modal.Title>Confirmar</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Confirmas que quieres borrar el producto{" "}
-          <strong>{productToDelete?.title}</strong>?
-        </Modal.Body>
-        <Modal.Footer className="d-flex justify-content-evenly">
-          <Button variant="secondary" onClick={cancelDelete}>
-            Cancelar
-          </Button>
-          <Button variant="danger" onClick={deleteProduct}>
-            Confirmar
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ConfirmModal
+        show={isDeleteDialogOpen}
+        onConfirm={deleteProduct}
+        onCancel={cancelDelete}
+      >
+        Confirmas que quieres borrar el producto{" "}
+        <strong>{productToDelete?.title}</strong>
+      </ConfirmModal>
     </>
   );
 }

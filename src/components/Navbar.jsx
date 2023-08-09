@@ -1,4 +1,4 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Container, Nav, Navbar, NavDropdown, NavItem } from "react-bootstrap";
 import { collection, getDocs, getFirestore } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
@@ -7,7 +7,9 @@ import {
   Building,
   CartFill,
   MoonFill,
+  PersonBadgeFill,
   PersonCircle,
+  PersonWorkspace,
 } from "react-bootstrap-icons";
 import { useMediaQuery } from "react-responsive";
 import { CartContext } from "../context/CartContext";
@@ -20,9 +22,11 @@ export default function NavigationBar() {
     isUserLogged: isUserLogged,
     userInfo: userInfo,
     isUserAdmin: isUserAdmin,
+    isUserSeller: isUserSeller,
     setUserInfo: setUserInfo,
     logOut: logOut,
   } = useContext(GeneralCompany);
+  const navigate = useNavigate();
 
   const [navbarBrand, setNavbarBrand] = useState(compInfo.companyName);
   const [expanded, setExpanded] = useState(false);
@@ -87,7 +91,10 @@ export default function NavigationBar() {
             <Nav.Link
               as={Link}
               to={`aboutUs/`}
-              onClick={() => setExpanded(false)}
+              onClick={() => {
+                window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                setExpanded(false);
+              }}
             >
               Sobre nosotros
             </Nav.Link>
@@ -103,7 +110,14 @@ export default function NavigationBar() {
                           as={Link}
                           to={`category/${subcategory.code}`}
                           key={subcategory + index}
-                          onClick={() => setExpanded(false)}
+                          onClick={() => {
+                            window.scrollTo({
+                              top: 0,
+                              left: 0,
+                              behavior: "smooth",
+                            });
+                            setExpanded(false);
+                          }}
                         >
                           {subcategory.name}
                         </NavDropdown.Item>
@@ -113,7 +127,14 @@ export default function NavigationBar() {
                     <NavDropdown.Item
                       as={Link}
                       to={`category/${category.id}`}
-                      onClick={() => setExpanded(false)}
+                      onClick={() => {
+                        window.scrollTo({
+                          top: 0,
+                          left: 0,
+                          behavior: "smooth",
+                        });
+                        setExpanded(false);
+                      }}
                     >
                       {category.name}
                     </NavDropdown.Item>
@@ -124,7 +145,10 @@ export default function NavigationBar() {
               <NavDropdown.Item
                 as={Link}
                 to={`category/`}
-                onClick={() => setExpanded(false)}
+                onClick={() => {
+                  window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                  setExpanded(false);
+                }}
               >
                 Todos los productos
               </NavDropdown.Item>
@@ -132,20 +156,36 @@ export default function NavigationBar() {
             <Nav.Link
               as={Link}
               to={`contact/`}
-              onClick={() => setExpanded(false)}
+              onClick={() => {
+                window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                setExpanded(false);
+              }}
             >
               Contacto
             </Nav.Link>
           </Nav>
           <Nav>
-            {isUserAdmin && (
+            {(isUserAdmin || isUserSeller) && (
               <Nav.Link
                 as={Link}
                 to={"/adminPage"}
                 className="d-flex align-items-center"
-                onClick={() => setExpanded(false)}
+                onClick={() => {
+                  window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                  setExpanded(false);
+                }}
               >
-                {!isLg ? <Building /> : "Administracion"}
+                {!isLg ? (
+                  isUserAdmin ? (
+                    <Building />
+                  ) : (
+                    <PersonWorkspace />
+                  )
+                ) : isUserAdmin ? (
+                  "Administracion"
+                ) : (
+                  "Vendedor"
+                )}
               </Nav.Link>
             )}
             <NavDropdown
@@ -155,7 +195,11 @@ export default function NavigationBar() {
             >
               {!isUserLogged ? (
                 <>
-                  <NavDropdown.Item as={Link} to={`/login`}>
+                  <NavDropdown.Item
+                    onClick={() => {
+                      navigate("/login", { state: { redirectTo: "/" } });
+                    }}
+                  >
                     Iniciar sesion
                   </NavDropdown.Item>
                 </>
@@ -163,7 +207,10 @@ export default function NavigationBar() {
                 <>
                   <NavDropdown.Item
                     style={{ pointerEvents: "none" }}
-                    onClick={() => setExpanded(false)}
+                    onClick={() => {
+                      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                      setExpanded(false);
+                    }}
                   >
                     Hola <strong>{userInfo.username}</strong>!
                   </NavDropdown.Item>
@@ -171,28 +218,40 @@ export default function NavigationBar() {
                   <NavDropdown.Item
                     as={Link}
                     to={`/user`}
-                    onClick={() => setExpanded(false)}
+                    onClick={() => {
+                      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                      setExpanded(false);
+                    }}
                   >
                     Mi perfil
                   </NavDropdown.Item>
                   <NavDropdown.Item
                     as={Link}
                     to={`/user/favorites`}
-                    onClick={() => setExpanded(false)}
+                    onClick={() => {
+                      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                      setExpanded(false);
+                    }}
                   >
                     Favoritos
                   </NavDropdown.Item>
                   <NavDropdown.Item
                     as={Link}
                     to={`/user/myOrders`}
-                    onClick={() => setExpanded(false)}
+                    onClick={() => {
+                      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                      setExpanded(false);
+                    }}
                   >
                     Mis compras
                   </NavDropdown.Item>
                   <NavDropdown.Item
                     as={Link}
                     to={`/user/settings`}
-                    onClick={() => setExpanded(false)}
+                    onClick={() => {
+                      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                      setExpanded(false);
+                    }}
                   >
                     Configuracion
                   </NavDropdown.Item>
@@ -207,7 +266,10 @@ export default function NavigationBar() {
               as={Link}
               to={"/cart"}
               className="d-flex align-items-center"
-              onClick={() => setExpanded(false)}
+              onClick={() => {
+                window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                setExpanded(false);
+              }}
             >
               {!isLg ? <CartFill className="order-1" /> : "Carrito"}
               {quantity > 0 && (

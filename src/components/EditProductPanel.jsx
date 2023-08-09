@@ -314,7 +314,7 @@ const EditProductPanel = ({ product, productChange, onClose }) => {
                 }
               }}
             >
-              Borar seleccionada
+              Borrar seleccionada
             </Button>
           </Col>
         </Col>

@@ -68,7 +68,9 @@ function App() {
   const [error, setError] = useState(undefined);
   const [developerData, setDeveloperData] = useState();
   const [userDocRef, setUserDocRef] = useState(null);
-
+  const [companyDocRef, setCompanyRef] = useState(null);
+  const isUserAdmin = userInfo.status === "admin" ? true : false;
+  const isUserSeller = userInfo.status === "seller" ? true : false;
   const handleLoginError = (error) => {
     console.log(error);
     setError(error);
@@ -108,10 +110,22 @@ function App() {
   };
   const fetchCompanyInfo = async () => {
     const data = await getDocs(collection(db, "companyInfo"));
-    const results = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-    console.log(results[0]);
-    return results[0];
+
+    if (!data.docs.length) {
+      console.error("No documents found in companyInfo collection.");
+      return [null, null];
+    }
+
+    // Only extracting the first document
+    const doc = data.docs[0];
+    const compData = { ...doc.data(), id: doc.id };
+    const docRef = doc.ref;
+
+    console.log(compData);
+
+    return [compData, docRef];
   };
+
   const fetchCategories = async () => {
     const data = await getDocs(collection(db, "categories"));
     const results = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
@@ -166,7 +180,18 @@ function App() {
   }
 
   function updateCompData(info) {
-    setCompanyInfo(info);
+    setCompanyInfo(info); // Update local state.
+
+    // If companyDocRef exists, update Firestore.
+    if (companyDocRef) {
+      updateDoc(companyDocRef, info)
+        .then(() => {
+          console.log("Company info updated in Firestore");
+        })
+        .catch((error) => {
+          console.error("Error updating company info: ", error);
+        });
+    }
   }
 
   useEffect(() => {
@@ -194,16 +219,27 @@ function App() {
 
   const logIn = useCallback((email, password) => {
     const auth = getAuth();
-    signInWithEmailAndPassword(auth, email, password).catch((error) => {
-      handleLoginError(error);
-      setUserInfo(genericUserData);
-      setUserLogged(false);
-      console.log(error);
-    });
+    return signInWithEmailAndPassword(auth, email, password)
+      .then(async () => {
+        const [docRef, userData] = await fetchUserData(email);
+        if (userData.enabled) {
+          return true;
+        } else {
+          const error = { code: "auth/account-disabled" };
+          handleLoginError(error);
+          return false;
+        }
+      })
+      .catch((error) => {
+        handleLoginError(error);
+        setUserInfo(genericUserData);
+        setUserLogged(false);
+        console.log(error);
+        return false;
+      });
   }, []);
 
   const logOut = () => {
-    console.log("here");
     const auth = getAuth();
     signOut(auth)
       .then(() => {
@@ -223,7 +259,11 @@ function App() {
   useEffect(() => {
     Promise.all([fetchCompanyInfo(), fetchCategories(), fetchDeveloperData()])
       .then(([info, cats, devData]) => {
-        setCompanyInfo(info);
+        const [companyData, companyRef] = info;
+        // Extracting actual data from the Firestore Document Snapshot
+        setCompanyInfo(companyData);
+        setCompanyRef(companyRef);
+        console.log(companyData);
         setNavCat(cats);
         setDeveloperData(devData);
         setLoading(false);
@@ -261,7 +301,8 @@ function App() {
           companyInfo: companyInfo,
           productCategories: navCat,
           isDarkTheme: userInfo.prefersDarkMode,
-          isUserAdmin: userInfo.status === "admin" ? true : false,
+          isUserAdmin: isUserAdmin,
+          isUserSeller: isUserSeller,
           isUserLogged: isUserLogged,
           username: userInfo.username,
           userFavorites: userInfo.favorites,
@@ -283,20 +324,16 @@ function App() {
             >
               {loading && <LoadingComponent size={"lg"} text={"interfaz"} />}
               <Routes>
-                {!isUserLogged && (
-                  <Route
-                    path="/login"
-                    exact
-                    element={<LoginPage logIn={logIn} error={error} />}
-                  />
-                )}
                 {!loading && (
                   <>
                     <Route path="/" element={<Home />} />
-                    <Route path="/login" element={<LoginRedirect />} />
+                    <Route
+                      path="/login"
+                      element={<LoginPage logIn={logIn} error={error} />}
+                    />
                     <Route path="/aboutUs" element={<AboutUs />} />
                     <Route path="/contact" element={<Contact />} />
-                    {isUserLogged && userInfo.status === "admin" && (
+                    {isUserLogged && (isUserAdmin || isUserSeller) && (
                       <Route path="/adminPage" element={<AdminPage />} />
                     )}
                     <Route path="/cart" element={<Cart />} />

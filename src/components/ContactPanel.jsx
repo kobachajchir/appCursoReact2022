@@ -4,16 +4,26 @@ import {
   getFirestore,
   doc,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Col, Container, Row, Table, Button } from "react-bootstrap";
+import { Col, Container, Row, Table, Button, Dropdown } from "react-bootstrap";
 import ContactDetailMessage from "./ContactDetailMessage";
-import { ArrowLeft } from "react-bootstrap-icons";
+import {
+  ArrowLeft,
+  CheckCircle,
+  CheckCircleFill,
+  EnvelopeFill,
+  EnvelopeOpenFill,
+  ThreeDotsVertical,
+} from "react-bootstrap-icons";
+import ConfirmModal from "./ConfirmModal";
 
 export default function ContactPanel() {
   const [messageList, setMessagesList] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [showMessageDetails, setShowMessageDetails] = useState(false);
+  const [isConfirmDialogOpen, setConfirmDialogOpen] = useState(false);
 
   const fetchContactMessages = async () => {
     const db = getFirestore();
@@ -30,7 +40,7 @@ export default function ContactPanel() {
       .catch((error) => console.error(error));
   }, []);
 
-  const handleVerDetalles = (messageId) => {
+  const selectMessage = (messageId) => {
     const selected = messageList.find((message) => message.id === messageId);
     console.log(selected);
     setSelectedMessage(selected);
@@ -38,6 +48,42 @@ export default function ContactPanel() {
 
   const handleVolver = () => {
     setSelectedMessage(null);
+  };
+
+  const cancelDelete = () => {
+    setSelectedMessage(null);
+    setConfirmDialogOpen(false);
+  };
+
+  const deleteMessage = async () => {
+    try {
+      if (!selectedMessage) {
+        console.error("No message selected to delete.");
+        return;
+      }
+
+      // Get the Firestore instance
+      const db = getFirestore();
+
+      // Reference the message document to be deleted
+      const messageRef = doc(db, "contactMessages", selectedMessage.id);
+
+      // Delete the document
+      await deleteDoc(messageRef);
+
+      // Optional: If you want to remove the deleted message from the local messageList state
+      setMessagesList((prevMessages) =>
+        prevMessages.filter((message) => message.id !== selectedMessage.id)
+      );
+
+      // Close the modal or do any other necessary action after deletion
+      setSelectedMessage(null);
+      if (isConfirmDialogOpen) {
+        setConfirmDialogOpen(false);
+      }
+    } catch (error) {
+      console.error("Error deleting message:", error);
+    }
   };
 
   const handleSetReaded = async (messageId, readedValue) => {
@@ -91,83 +137,131 @@ export default function ContactPanel() {
     }
   }, [selectedMessage]);
   return (
-    <Container fluid>
-      <Row className="d-flex justify-content-center align-items-center">
-        <Col
-          xs={12}
-          className="d-flex justify-content-center align-items-center flex-row"
-        >
-          {showMessageDetails && (
-            <Button
-              variant="danger"
-              onClick={handleVolver}
-              style={{ marginRight: "10px" }}
-            >
-              <ArrowLeft color={"var(--bs-emphasis-color)"} />
-            </Button>
-          )}
-          <h3>
-            {!showMessageDetails
-              ? "Listado de Mensajes"
-              : "Detalles de mensaje"}
-          </h3>
-        </Col>
-        <Col xs={12}>
-          {showMessageDetails && selectedMessage ? (
-            <ContactDetailMessage
-              message={selectedMessage}
-              onSetReaded={handleSetReaded}
-              onSetResolved={handleSetResolved}
-              onMessageUpdated={(updatedMessageId) => {
-                fetchContactMessages()
-                  .then((msgList) => {
-                    setMessagesList(msgList);
-                  })
-                  .catch((error) => console.error(error));
-              }}
-            />
-          ) : (
-            <Table striped bordered responsive>
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Asunto</th>
-                  <th>Leído</th>
-                  <th>Resuelto</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
+    <>
+      <Container fluid>
+        <Row className="d-flex justify-content-center align-items-center">
+          <Col
+            xs={12}
+            className="d-flex justify-content-center align-items-center flex-row"
+          >
+            {showMessageDetails && (
+              <Button
+                variant="danger"
+                onClick={handleVolver}
+                style={{ marginRight: "10px" }}
+              >
+                <ArrowLeft color={"var(--bs-emphasis-color)"} />
+              </Button>
+            )}
+            <h3>
+              {!showMessageDetails
+                ? "Listado de Mensajes"
+                : "Detalles de mensaje"}
+            </h3>
+          </Col>
+          <Col xs={12}>
+            {showMessageDetails && selectedMessage ? (
+              <ContactDetailMessage
+                message={selectedMessage}
+                onSetReaded={handleSetReaded}
+                onSetResolved={handleSetResolved}
+                onMessageUpdated={(updatedMessageId) => {
+                  fetchContactMessages()
+                    .then((msgList) => {
+                      setMessagesList(msgList);
+                    })
+                    .catch((error) => console.error(error));
+                }}
+              />
+            ) : (
+              <>
                 {messageList.map((message) => (
-                  <tr key={message.id} style={{ verticalAlign: "baseline" }}>
-                    <td>{message.createdOn}</td>
-                    <td>{message.subject}</td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={message.readed}
-                        readOnly
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={message.resolved}
-                        readOnly
-                      />
-                    </td>
-                    <td>
-                      <button onClick={() => handleVerDetalles(message.id)}>
-                        Ver detalles
-                      </button>
-                    </td>
-                  </tr>
+                  <Row
+                    key={message.id}
+                    className="align-items-center mb-3"
+                    style={{
+                      backgroundColor: "var(--bs-dark-bg-subtle)",
+                      borderRadius: "var(--bs-border-radius)",
+                    }}
+                  >
+                    <Col>{message.createdOn}</Col>
+                    <Col>{message.subject}</Col>
+                    <Col>
+                      {!message.readed ? (
+                        <EnvelopeFill
+                          size={25}
+                          style={{ marginLeft: "2.5px", marginRight: "2.5px" }}
+                          color="var(--bs-danger-text-emphasis)"
+                        />
+                      ) : (
+                        <EnvelopeOpenFill
+                          size={25}
+                          style={{ marginLeft: "2.5px", marginRight: "2.5px" }}
+                        />
+                      )}
+                    </Col>
+                    <Col>
+                      {!message.resolved ? (
+                        <CheckCircle
+                          size={25}
+                          style={{ marginLeft: "2.5px", marginRight: "2.5px" }}
+                        />
+                      ) : (
+                        <CheckCircleFill
+                          color="var(--bs-success-text-emphasis)"
+                          size={25}
+                          style={{ marginLeft: "2.5px", marginRight: "2.5px" }}
+                        />
+                      )}
+                    </Col>
+                    <Col>
+                      <Dropdown>
+                        <Dropdown.Toggle
+                          id="dropdown-basic"
+                          style={{
+                            backgroundColor: "transparent",
+                            border: "none",
+                            color: "var(--bs-secondary-text-emphasis)",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <ThreeDotsVertical />
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu>
+                          <Dropdown.Item
+                            onClick={() => selectMessage(message.id)}
+                          >
+                            Ver detalles
+                          </Dropdown.Item>
+                          <Dropdown.Item
+                            onClick={() => {
+                              selectMessage(message.id);
+                              setConfirmDialogOpen(true);
+                            }}
+                          >
+                            Eliminar
+                          </Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown>
+                    </Col>
+                  </Row>
                 ))}
-              </tbody>
-            </Table>
-          )}
-        </Col>
-      </Row>
-    </Container>
+              </>
+            )}
+          </Col>
+        </Row>
+      </Container>
+      <ConfirmModal
+        show={isConfirmDialogOpen}
+        onConfirm={deleteMessage}
+        onCancel={cancelDelete}
+      >
+        Confirmas que quieres borrar el mensaje titulado{" "}
+        <strong>{selectedMessage?.subject}</strong>
+        {"?"}
+      </ConfirmModal>
+    </>
   );
 }

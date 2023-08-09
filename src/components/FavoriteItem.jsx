@@ -8,10 +8,12 @@ import { useMediaQuery } from "react-responsive";
 import testImage from "./../assets/images/testProduct.jpg";
 import { useEffect, useState } from "react";
 import { getDownloadURL, getStorage, ref } from "firebase/storage";
+import LoadingComponent from "./LoadingComponent";
 
 export default function FavoriteItem(props) {
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
   const [picture, setPicture] = useState(null);
+  const [loading, setLoading] = useState(true);
   async function fetchProductImage() {
     const storage = getStorage();
 
@@ -30,9 +32,11 @@ export default function FavoriteItem(props) {
     }
   }
   useEffect(() => {
-    fetchProductImage().then((pictureUrl) => {
-      setPicture(pictureUrl);
-    });
+    fetchProductImage()
+      .then((pictureUrl) => {
+        setPicture(pictureUrl);
+      })
+      .then(setLoading(false));
   }, []);
   return (
     <Col
@@ -55,15 +59,17 @@ export default function FavoriteItem(props) {
         xs={12}
         lg={"auto"}
         className="justify-content-center text-center"
+        style={{ position: "relative", height: "100%" }}
       >
+        {loading && <LoadingComponent text={"favorito"} />}
         <LazyLoadImage
           className=""
-          alt={props.item.code + "ProdImg"}
-          src={picture !== null && picture !== undefined ? picture : testImage}
+          src={picture !== null && picture !== undefined ? picture : ""}
           style={{
             borderRadius: "var(--bs-border-radius)",
             height: "20vh",
             width: "auto",
+            visibility: loading ? "hidden" : "visible",
           }}
         />
       </Row>

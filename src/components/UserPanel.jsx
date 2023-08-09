@@ -22,7 +22,14 @@ import {
   Form,
   Alert,
 } from "react-bootstrap";
-import { ThreeDotsVertical, X, XOctagonFill } from "react-bootstrap-icons";
+import {
+  PersonCheckFill,
+  PersonDashFill,
+  PersonXFill,
+  ThreeDotsVertical,
+  X,
+  XOctagonFill,
+} from "react-bootstrap-icons";
 import { GeneralCompany } from "../App";
 //import ModifyUserAccount from "./ModifyUserAccount";
 
@@ -182,112 +189,86 @@ export default function UserPanel() {
       </Row>
       <Row>
         <Col xs={12}>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Nombre de usuario</th>
-                <th>Email</th>
-                <th>Telefono</th>
-                <th>Tipo de cuenta</th>
-                <th>Habilitado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users
-                .filter(
-                  (user) =>
-                    filterUserType === "all" || user.status === filterUserType
-                )
-                .map((user) => (
-                  <tr key={user.id}>
-                    <td
+          {users
+            .filter(
+              (user) =>
+                filterUserType === "all" || user.status === filterUserType
+            )
+            .map((user) => (
+              <Row
+                key={user.id}
+                className="align-items-center mb-3"
+                style={{
+                  backgroundColor: "var(--bs-dark-bg-subtle)",
+                  borderRadius: "var(--bs-border-radius)",
+                  paddingTop: "10px",
+                  paddingBottom: "10px",
+                }}
+              >
+                <Col>
+                  {user.username}
+                  {user.username === username ? " (Tu)" : ""}
+                </Col>
+                <Col>{user.userEmail}</Col>
+                <Col>{user.userPhone}</Col>
+                <Col>
+                  {user.status === "admin"
+                    ? "Administrador"
+                    : user.status === "user"
+                    ? "Usuario"
+                    : user.status === "seller"
+                    ? "Vendedor"
+                    : ""}
+                </Col>
+                <Col>
+                  {user.enabled ? (
+                    <PersonCheckFill
+                      size={25}
+                      color="var(--bs-success-text-emphasis)"
+                    />
+                  ) : (
+                    <PersonXFill
+                      size={25}
+                      color="var(--bs-danger-text-emphasis)"
+                    />
+                  )}
+                </Col>
+                <Col>
+                  <Dropdown>
+                    <Dropdown.Toggle
+                      id="dropdown-basic"
                       style={{
-                        verticalAlign: "middle",
+                        backgroundColor: "transparent",
+                        border: "none",
+                        color: "var(--bs-secondary-text-emphasis)",
+                        display: "flex",
+                        alignItems: "center",
                       }}
                     >
-                      {user.username}
-                      {user.username === username ? " (Tu)" : ""}
-                    </td>
-                    <td
-                      style={{
-                        verticalAlign: "middle",
-                      }}
-                    >
-                      {user.userEmail}
-                    </td>
-                    <td
-                      style={{
-                        verticalAlign: "middle",
-                      }}
-                    >
-                      {user.userPhone}
-                    </td>
-                    <td
-                      style={{
-                        verticalAlign: "middle",
-                      }}
-                    >
-                      {user.status === "admin"
-                        ? "Administrador"
-                        : user.status === "user"
-                        ? "Usuario"
-                        : user.status === "seller"
-                        ? "Vendedor"
-                        : ""}
-                    </td>
-                    <td
-                      style={{
-                        verticalAlign: "middle",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        name={`enabledChk${user.username}`}
-                        id={`enabledChk${user.username}`}
-                        checked={user.enabled}
-                        style={{ pointerEvents: "none" }}
-                        readOnly
-                      />
-                    </td>
-                    <td>
-                      <Dropdown>
-                        <Dropdown.Toggle
-                          id="dropdown-basic"
-                          style={{
-                            backgroundColor: "transparent",
-                            border: "none",
-                            color: "var(--bs-secondary-text-emphasis)",
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          <ThreeDotsVertical />
-                        </Dropdown.Toggle>
+                      <ThreeDotsVertical />
+                    </Dropdown.Toggle>
 
-                        <Dropdown.Menu>
-                          <Dropdown.Item onClick={() => handleModify(user)}>
-                            Modificar
-                          </Dropdown.Item>
-                          <Dropdown.Item
-                            onClick={() => handleEnableDisable(user)}
-                            disabled={user.username === username ? true : false}
-                          >
-                            {user.enabled ? "Deshabilitar" : "Habilitar"}
-                          </Dropdown.Item>
-                          <Dropdown.Item
-                            onClick={() => handleChangeType(user)}
-                            disabled={user.username === username ? true : false}
-                          >
-                            Cambiar tipo de cuenta
-                          </Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </Table>
+                    <Dropdown.Menu>
+                      <Dropdown.Item onClick={() => handleModify(user)}>
+                        Modificar
+                      </Dropdown.Item>
+                      <Dropdown.Item
+                        onClick={() => handleEnableDisable(user)}
+                        disabled={user.username === username ? true : false}
+                      >
+                        {user.enabled ? "Deshabilitar" : "Habilitar"}
+                      </Dropdown.Item>
+                      <Dropdown.Item
+                        onClick={() => handleChangeType(user)}
+                        disabled={user.username === username ? true : false}
+                      >
+                        Cambiar tipo de cuenta
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </Col>
+              </Row>
+            ))}
         </Col>
       </Row>
 

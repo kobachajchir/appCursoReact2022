@@ -3,6 +3,8 @@ import { Col, Button } from "react-bootstrap";
 import { ChromePicker, SketchPicker } from "react-color";
 import { useMediaQuery } from "react-responsive";
 import { GeneralCompany } from "../App";
+import { getFirestore } from "firebase/firestore";
+import ReAuthenticationModal from "./ReAuthenticateModal";
 
 const CompanyDataPanel = () => {
   const {
@@ -13,6 +15,7 @@ const CompanyDataPanel = () => {
   const [companyData, setCompanyData] = useState(defaultData);
   const [isChanged, setIsChanged] = useState(false);
   const isLg = useMediaQuery({ query: "(max-width: 992px)" });
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     console.log(defaultData.companyColors[0]);
@@ -48,13 +51,21 @@ const CompanyDataPanel = () => {
       };
     });
   };
+
   const handleReset = () => {
     setCompanyData(defaultData);
   };
 
-  const handleSave = () => {
+  const handleSuccess = () => {
     setCompData(companyData);
   };
+
+  const handleSave = () => {
+    if (isChanged) {
+      setShowModal(true);
+    }
+  };
+
   const inputStyles = {
     color: "var(--bs-body-color)",
     backgroundColor: "var(--bs-secondary-bg)",
@@ -66,6 +77,11 @@ const CompanyDataPanel = () => {
   };
   return (
     <>
+      <ReAuthenticationModal
+        show={showModal}
+        handleClose={() => setShowModal(false)}
+        onSuccess={handleSuccess}
+      />
       <Col
         xs={12}
         className="d-flex justify-content-center align-items-center"
