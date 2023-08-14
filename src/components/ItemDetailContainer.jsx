@@ -12,6 +12,7 @@ import {
   where,
 } from "firebase/firestore";
 import { Container, Row } from "react-bootstrap";
+import { formatDate } from "../tools/formatDate";
 
 export default function ItemDetailContainer(props) {
   const [product, setProduct] = useState();
@@ -47,7 +48,9 @@ export default function ItemDetailContainer(props) {
       setProduct({ id: snapshot.id, ...snapshot.data() });
       setLoading(false);
       fetchSalesData(snapshot.data().code).then((saleData) => {
-        setSale(saleData); // Set the sale state here
+        if (!(new Date(saleData.discountEnding.seconds * 1000) < new Date())) {
+          setSale(saleData); // Set the sale state here
+        }
       });
     });
   }, [loading]);

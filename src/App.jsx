@@ -40,6 +40,7 @@ import { ParallaxProvider } from "react-scroll-parallax";
 import LoadingComponent from "./components/LoadingComponent";
 import { PersonCheckFill, PersonXFill } from "react-bootstrap-icons";
 import { showNotification } from "./components/ToastNotification";
+import ModifyUserForm from "./components/ModifyUserForm";
 export const GeneralCompany = createContext();
 const firebaseConfig = {
   apiKey: "AIzaSyClyM0t39WQ8SI37pIZycGy2o02d57byxs",
@@ -194,6 +195,19 @@ function App() {
     }
   }
 
+  function updateUserData(data) {
+    setUserInfo(data);
+    if (userDocRef) {
+      updateDoc(userDocRef, data)
+        .then(() => {
+          console.log("User data updated in Firestore");
+        })
+        .catch((error) => {
+          console.error("Error updating data: ", error);
+        });
+    }
+  }
+
   useEffect(() => {
     const auth = getAuth();
 
@@ -311,6 +325,7 @@ function App() {
           setCompData: updateCompData,
           setUserFavorites: updateUserFavorites,
           setUserTheme: updateUserTheme,
+          setUserData: updateUserData,
           logIn: logIn,
           logOut: logOut,
         }}
@@ -356,7 +371,10 @@ function App() {
                           element={<FavoritesListContainer />}
                         />
                         <Route path="/user/myOrders" element={<UserOrders />} />
-                        <Route path="/user/settings" element={<User />} />
+                        <Route
+                          path="/user/settings"
+                          element={<ModifyUserForm />}
+                        />
                       </>
                     )}
                     <Route path="*" element={<NotFound />} />

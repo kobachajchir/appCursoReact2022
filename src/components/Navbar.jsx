@@ -27,7 +27,6 @@ export default function NavigationBar() {
     logOut: logOut,
   } = useContext(GeneralCompany);
   const navigate = useNavigate();
-
   const [navbarBrand, setNavbarBrand] = useState(compInfo.companyName);
   const [expanded, setExpanded] = useState(false);
   const { quantity, totalWithDiscount, validatedCoupon, priceWithCoupon } =

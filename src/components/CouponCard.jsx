@@ -8,11 +8,21 @@ export default function CouponCard({ coupon, children, style }) {
     marginTop: "5px",
     marginBottom: "5px",
   };
+  const isExpired =
+    Number(coupon.amountRedeem) === Number(coupon.amountAvailable);
   return (
     <Card style={style}>
       <Card.Body>
         <>
           <Card.Title>{coupon.code}</Card.Title>
+          <Card.Subtitle>
+            {isExpired && (
+              <span style={{ color: "red", fontWeight: "bold" }}>
+                {" "}
+                EXPIRADO
+              </span>
+            )}
+          </Card.Subtitle>
           <Card.Text style={textStyles}>
             Porcentaje de descuento: {coupon.discountPercentage}
           </Card.Text>

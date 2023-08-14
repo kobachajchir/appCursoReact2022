@@ -175,58 +175,75 @@ function User() {
 
   return (
     <Container>
-      <Row className="d-flex align-items-center justify-content-center text-center">
+      <Row className="d-flex align-items-center justify-content-center text-center flex-row">
         <Col
           xs={12}
+          style={{
+            marginTop: "15px",
+          }}
+          as={Row}
+        >
+          <h2>
+            <strong>{user.username}</strong>
+          </h2>
+        </Col>
+      </Row>
+      <Row className="d-flex align-items-center justify-content-center text-center flex-row">
+        <Col
+          xs={12}
+          lg={6}
           className="d-flex align-items-center justify-content-center text-center flex-column"
           as={Row}
         >
           <Col>
-            <img
-              src={
-                userProfilePicture !== null && userProfilePicture !== undefined
-                  ? userProfilePicture
-                  : defaultUserImage
-              }
-              alt="Profile"
-              className=""
-              style={{
-                width: "25vw",
-                minWidth: "250px",
-                maxWidth: "500px",
-                height: "auto",
-                marginTop: "25px",
-                borderRadius: "50%",
-              }}
-            />
-          </Col>
-          <Col style={{ marginBottom: "15px" }}>
-            <Button
-              onClick={handleModifyUserPicture}
-              style={{
-                background: "transparent",
-                border: "none",
-              }}
-            >
-              <PencilFill
-                size={25}
-                color="var(--bs-emphasis-color)"
-              ></PencilFill>
-            </Button>
-            {userProfilePicture && (
+            <Col>
+              <img
+                src={
+                  userProfilePicture !== null &&
+                  userProfilePicture !== undefined
+                    ? userProfilePicture
+                    : defaultUserImage
+                }
+                alt="Profile"
+                className=""
+                style={{
+                  width: "25vw",
+                  minWidth: "250px",
+                  maxWidth: "500px",
+                  height: "auto",
+                  marginTop: "5px",
+                  borderRadius: "50%",
+                }}
+              />
+            </Col>
+            <Col style={{ marginBottom: "15px" }}>
               <Button
-                onClick={handleDeleteUserPicture}
+                onClick={handleModifyUserPicture}
                 style={{
                   background: "transparent",
                   border: "none",
                 }}
               >
-                <Trash3Fill
+                <PencilFill
                   size={25}
                   color="var(--bs-emphasis-color)"
-                ></Trash3Fill>
+                ></PencilFill>
               </Button>
-            )}
+              {userProfilePicture && (
+                <Button
+                  onClick={handleDeleteUserPicture}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                  }}
+                >
+                  <Trash3Fill
+                    size={25}
+                    color="var(--bs-emphasis-color)"
+                  ></Trash3Fill>
+                </Button>
+              )}
+            </Col>
           </Col>
           <input
             type="file"
@@ -235,140 +252,148 @@ function User() {
             accept=".jpg,.jpeg,.png"
             onChange={handleFileChange}
           />
+          <Col xs={12}>
+            <p>Creado el: {formatDate(user.createdOn)}</p>
+          </Col>
         </Col>
-        <Col xs={12}>
-          <h2>
-            <strong>{user.username}</strong>
-          </h2>
-        </Col>
-        <Col xs={12}>
-          <p>Creado el: {formatDate(user.createdOn)}</p>
-        </Col>
-        <Row
-          style={{
-            backgroundColor: "var(--bs-secondary-bg-subtle)",
-            borderRadius: "var(--bs-border-radius)",
-          }}
+        <Col
+          className="d-flex align-items-center justify-content-center text-center flex-column"
+          as={Row}
+          xs={12}
+          lg={6}
         >
-          <Col xs={12}>
-            <h4
+          <Col>
+            <Row
               style={{
-                marginTop: "10px",
-                marginBottom: "10px",
+                backgroundColor: "var(--bs-secondary-bg-subtle)",
+                borderRadius: "var(--bs-border-radius)",
               }}
             >
-              Datos de contacto:
-            </h4>
+              <Col xs={12}>
+                <h4
+                  style={{
+                    marginTop: "10px",
+                    marginBottom: "10px",
+                  }}
+                >
+                  Datos de contacto:
+                </h4>
+              </Col>
+              <Col xs={12}>
+                <h3>
+                  Email: <strong>{user.userEmail}</strong>
+                </h3>
+              </Col>
+              <Col xs={12}>
+                <h3>
+                  Telefono: <strong>{user.userPhone}</strong>
+                </h3>
+              </Col>
+            </Row>
           </Col>
-          <Col xs={12}>
-            <h3>
-              Email: <strong>{user.userEmail}</strong>
-            </h3>
-          </Col>
-          <Col xs={12}>
-            <h3>
-              Telefono: <strong>{user.userPhone}</strong>
-            </h3>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={12}>
-            <Button
-              onClick={() => setShowAddresses(!showAddress)}
-              style={{
-                marginTop: "10px",
-                marginBottom: "10px",
-              }}
-            >
-              {!showAddress ? "Mostrar direcciones" : "Ocultar direcciones"}
-            </Button>
-          </Col>
-          {showAddress &&
-            addresses.map((address, index) => (
-              <div
-                style={{
-                  backgroundColor: "var(--bs-dark-bg-subtle)",
-                  borderRadius: "var(--bs-border-radius)",
-                }}
-              >
-                <Col xs={12} key={"dirText" + index}>
-                  <h3>Direccion {index + 1}:</h3>
-                </Col>
-                <Col xs={12} key={index}>
-                  <Table
-                    striped
-                    bordered
-                    hover
+          <Col>
+            <Row className="d-flex align-items-center justify-content-center text-center flex-column">
+              <Col xs={12}>
+                <Button
+                  onClick={() => setShowAddresses(!showAddress)}
+                  style={{
+                    marginTop: "10px",
+                    marginBottom: "10px",
+                  }}
+                >
+                  {!showAddress ? "Mostrar direcciones" : "Ocultar direcciones"}
+                </Button>
+              </Col>
+              {showAddress &&
+                addresses.map((address, index) => (
+                  <div
                     style={{
-                      margin: 0,
+                      backgroundColor: "var(--bs-dark-bg-subtle)",
+                      borderRadius: "var(--bs-border-radius)",
                     }}
                   >
-                    <tbody>
-                      <tr>
-                        <td style={{ verticalAlign: "middle" }}>
-                          <strong>Dirección</strong>
-                        </td>
-                        <td style={{ verticalAlign: "middle" }}>
-                          {`Departamento: ${address.apartment}, Piso: ${address.floor}, ${address.street} ${address.number}`}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style={{ verticalAlign: "middle" }}>
-                          <strong>Ciudad, Provincia</strong>
-                        </td>
-                        <td style={{ verticalAlign: "middle" }}>
-                          {`${address.city}, ${address.state}`}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style={{ verticalAlign: "middle" }}>
-                          <strong>Código Postal</strong>
-                        </td>
-                        <td style={{ verticalAlign: "middle" }}>
-                          {address.postalCode}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style={{ verticalAlign: "middle" }}>
-                          <strong>Coordenadas</strong>
-                        </td>
-                        <td style={{ verticalAlign: "middle" }}>
-                          {Object.entries(address.mapLocation)
-                            .map(
-                              (entry, index) =>
-                                `${parseFloat(entry[1]).toFixed(3)}${
-                                  index === 0 ? "° S" : "° W"
-                                }`
-                            )
-                            .join(", ")}
-                          <button
-                            style={{
-                              backgroundColor: "var(--bs-dark-bg-subtle)",
-                              border: "none",
-                              color: "var(--bs-secondary-text-emphasis)",
-                              marginLeft: "10px",
-                            }}
-                            onClick={() => handleViewOnMap(address.mapLocation)}
-                          >
-                            Ver en mapa
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </Table>
-                  <Button
-                    onClick={handleModifyAddress}
-                    style={{
-                      marginTop: "10px",
-                      marginBottom: "10px",
-                    }}
-                  >
-                    Modificar direccion
-                  </Button>
-                </Col>
-              </div>
-            ))}
-        </Row>
+                    <Col xs={12} key={"dirText" + index}>
+                      <h3>Direccion {index + 1}:</h3>
+                    </Col>
+                    <Col xs={12} key={index}>
+                      <Table
+                        striped
+                        bordered
+                        hover
+                        style={{
+                          margin: 0,
+                        }}
+                      >
+                        <tbody>
+                          <tr>
+                            <td style={{ verticalAlign: "middle" }}>
+                              <strong>Dirección</strong>
+                            </td>
+                            <td style={{ verticalAlign: "middle" }}>
+                              {`Departamento: ${address.apartment}, Piso: ${address.floor}, ${address.street} ${address.number}`}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style={{ verticalAlign: "middle" }}>
+                              <strong>Ciudad, Provincia</strong>
+                            </td>
+                            <td style={{ verticalAlign: "middle" }}>
+                              {`${address.city}, ${address.state}`}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style={{ verticalAlign: "middle" }}>
+                              <strong>Código Postal</strong>
+                            </td>
+                            <td style={{ verticalAlign: "middle" }}>
+                              {address.postalCode}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style={{ verticalAlign: "middle" }}>
+                              <strong>Coordenadas</strong>
+                            </td>
+                            <td style={{ verticalAlign: "middle" }}>
+                              {Object.entries(address.mapLocation)
+                                .map(
+                                  (entry, index) =>
+                                    `${parseFloat(entry[1]).toFixed(3)}${
+                                      index === 0 ? "° S" : "° W"
+                                    }`
+                                )
+                                .join(", ")}
+                              <button
+                                style={{
+                                  backgroundColor: "var(--bs-dark-bg-subtle)",
+                                  border: "none",
+                                  color: "var(--bs-secondary-text-emphasis)",
+                                  marginLeft: "10px",
+                                }}
+                                onClick={() =>
+                                  handleViewOnMap(address.mapLocation)
+                                }
+                              >
+                                Ver en mapa
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </Table>
+                      <Button
+                        onClick={handleModifyAddress}
+                        style={{
+                          marginTop: "10px",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        Modificar direccion
+                      </Button>
+                    </Col>
+                  </div>
+                ))}
+            </Row>
+          </Col>
+        </Col>
       </Row>
     </Container>
   );

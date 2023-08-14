@@ -4,6 +4,7 @@ import { GeneralCompany } from "../App";
 import { useMediaQuery } from "react-responsive";
 import { ArrowLeft, PlusLg } from "react-bootstrap-icons";
 import {
+  deleteObject,
   getDownloadURL,
   getStorage,
   list,
@@ -29,30 +30,28 @@ const EditProductPanel = ({ product, productChange, onClose }) => {
   const [pictureAmount, setPictureAmount] = useState(0);
   const [loading, setLoading] = useState(true);
   const fileInput = useRef();
+  const [imagePaths, setImagePaths] = useState([]);
+
   async function fetchProductImages() {
     const storage = getStorage();
-
-    // Construct the path to the directory in Firebase Storage
     const dirPath = `appData/productImages/${product.code}`;
-
-    // Create a reference to the directory
     const dirRef = ref(storage, dirPath);
-
-    // List files in the directory and limit results to 5
     let urls = [];
+    let paths = []; // new array for paths
     let amount = 0;
+
     try {
       const listResults = await list(dirRef, { maxResults: 5 });
       amount = listResults.items.length;
       for (let i = 0; i < listResults.items.length; i++) {
         const url = await getDownloadURL(listResults.items[i]);
         urls.push(url);
+        paths.push(listResults.items[i].fullPath); // store the fullPath (the storage path)
       }
     } catch (error) {
       console.error("Error listing files in directory:", error);
     }
-
-    return [urls, amount];
+    return [urls, amount, paths]; // also return paths
   }
 
   useEffect(() => {
@@ -61,9 +60,10 @@ const EditProductPanel = ({ product, productChange, onClose }) => {
 
   useEffect(() => {
     if (loading) {
-      fetchProductImages().then(([pictureUrls, amount]) => {
+      fetchProductImages().then(([pictureUrls, amount, paths]) => {
         setPictures(pictureUrls);
         setPictureAmount(amount);
+        setImagePaths(paths); // set the paths to state
         setLoading(false);
       });
     }
@@ -169,6 +169,36 @@ const EditProductPanel = ({ product, productChange, onClose }) => {
         setImageUrls((oldUrls) => [...oldUrls, reader.result]);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const deleteImage = () => {
+    if (selectedImageIndex >= 0 && selectedImageIndex < imagePaths.length) {
+      const storage = getStorage();
+      const imageRef = ref(storage, imagePaths[selectedImageIndex]); // get the reference to the selected image using its path
+
+      // delete the image
+      deleteObject(imageRef)
+        .then(() => {
+          console.log("Image deleted successfully.");
+          // You might want to remove the image from the UI by updating the pictures and imagePaths states
+          const updatedPictures = [...pictures];
+          updatedPictures.splice(selectedImageIndex, 1);
+          setPictures(updatedPictures);
+
+          const updatedPaths = [...imagePaths];
+          updatedPaths.splice(selectedImageIndex, 1);
+          setImagePaths(updatedPaths);
+
+          // if selectedImageIndex is now out of bounds, reset it to 0
+          if (selectedImageIndex >= updatedPictures.length) {
+            setSelectedImageIndex(0);
+          }
+          setLoading(true); // reload images
+        })
+        .catch((error) => {
+          console.error("Error deleting image:", error);
+        });
     }
   };
 
@@ -307,12 +337,8 @@ const EditProductPanel = ({ product, productChange, onClose }) => {
                 border: "none",
                 color: "var(--bs-emphasis-color)",
               }}
-              disabled={pictureAmount <= 0}
-              onClick={() => {
-                if (pictureAmount < 0) {
-                  //deleteimage
-                }
-              }}
+              disabled={pictureAmount <= 1}
+              onClick={deleteImage}
             >
               Borrar seleccionada
             </Button>

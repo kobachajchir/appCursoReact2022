@@ -43,6 +43,7 @@ export default function UserPanel() {
   const [errorMessage, setErrorMessage] = useState("");
   const [modifyEnableDisable, setEnableDisable] = useState(false);
   const [filterUserType, setFilterUserType] = useState("all");
+  const [searchQuery, setSearchQuery] = useState(""); // State to store the search query
   const errorBannerStyle = {
     color: "var(--bs-body-color)",
     backgroundColor: "var(--bs-danger-border-subtle)",
@@ -168,12 +169,12 @@ export default function UserPanel() {
       </Row>
       <Row
         className="d-flex justify-content-center align-items-center text-center flex-row"
-        style={{ marginBottom: "10px" }}
+        style={{ marginBottom: "10px", width: "100%" }}
       >
-        <Col xs={12} lg={"auto"}>
+        <Col xs={"auto"}>
           <h5 style={{ margin: 0 }}>Mostrar</h5>
         </Col>
-        <Col xs={12} lg={"auto"}>
+        <Col xs={"auto"}>
           <select
             value={filterUserType}
             style={inputStyles}
@@ -186,14 +187,34 @@ export default function UserPanel() {
             <option value="admin">Administradores</option>
           </select>
         </Col>
+        <div className="w-100"></div>
+        <Col xs={"auto"}>
+          <h5 style={{ margin: 0 }}>Buscar</h5>
+        </Col>
+        <Col xs={"auto"}>
+          <input
+            type="text"
+            value={searchQuery}
+            style={inputStyles}
+            placeholder="Buscar por nombre de usuario"
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </Col>
       </Row>
       <Row>
         <Col xs={12}>
           {users
-            .filter(
-              (user) =>
-                filterUserType === "all" || user.status === filterUserType
-            )
+            .filter((user) => {
+              if (searchQuery.trim() !== "") {
+                return user.username
+                  .toLowerCase()
+                  .includes(searchQuery.toLowerCase());
+              } else {
+                return (
+                  filterUserType === "all" || user.status === filterUserType
+                );
+              }
+            })
             .map((user) => (
               <Row
                 key={user.id}
