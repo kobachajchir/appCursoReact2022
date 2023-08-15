@@ -118,10 +118,6 @@ function User() {
     }
   };
 
-  if (showModifyAddress) {
-    return <ModifyAddress />; // ModifyAddress component should also receive user's addresses as props
-  }
-
   async function fetchAddresses() {
     const db = getFirestore();
     const addresses = user.userAddress; // assuming user.userAddress is an array of document paths
@@ -379,15 +375,6 @@ function User() {
                           </tr>
                         </tbody>
                       </Table>
-                      <Button
-                        onClick={handleModifyAddress}
-                        style={{
-                          marginTop: "10px",
-                          marginBottom: "10px",
-                        }}
-                      >
-                        Modificar direccion
-                      </Button>
                     </Col>
                   </div>
                 ))}
