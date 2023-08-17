@@ -27,7 +27,7 @@ export default function CouponCard({ coupon, children, style }) {
             Porcentaje de descuento: {coupon.discountPercentage}
           </Card.Text>
           <Card.Text style={textStyles}>
-            Cantidad restante: {coupon.amountAvailable}
+            Cantidad de cupones: {coupon.amountAvailable}
           </Card.Text>
           <Card.Text style={{ ...textStyles, marginBottom: "15px" }}>
             Cantidad canjeados: {coupon.amountRedeem}

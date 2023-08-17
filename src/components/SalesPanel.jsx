@@ -12,6 +12,7 @@ export default function SalesPanel() {
   const [needRefreshSales, setRefreshSales] = useState(false);
   const [sales, setSales] = useState([]);
   const [coupons, setCoupons] = useState([]);
+  const [userCoupons, setUserCoupons] = useState([]);
   const db = getFirestore();
 
   const fetchSales = async () => {
@@ -26,15 +27,29 @@ export default function SalesPanel() {
 
   useEffect(() => {
     Promise.all([fetchSales(), fetchCoupons()]).then(([sales, coupons]) => {
+      const userSpecificCoupons = coupons.filter((coupon) =>
+        coupon.code.includes("usercoupon")
+      );
+      const nonUserSpecificCoupons = coupons.filter(
+        (coupon) => !coupon.code.includes("usercoupon")
+      );
+      setCoupons(nonUserSpecificCoupons);
+      setUserCoupons(userSpecificCoupons);
       setSales(sales);
-      setCoupons(coupons);
     });
   }, []);
 
   useEffect(() => {
     if (needRefreshCoupons) {
       fetchCoupons().then((coupons) => {
-        setCoupons(coupons);
+        const userSpecificCoupons = coupons.filter((coupon) =>
+          coupon.code.includes("usercoupon")
+        );
+        const nonUserSpecificCoupons = coupons.filter(
+          (coupon) => !coupon.code.includes("usercoupon")
+        );
+        setCoupons(nonUserSpecificCoupons);
+        setUserCoupons(userSpecificCoupons);
         setRefreshCoupons(false);
       });
     }
@@ -113,6 +128,7 @@ export default function SalesPanel() {
               <ListSales
                 sales={sales}
                 coupons={coupons}
+                userCoupons={userCoupons}
                 refreshCoupons={needRefreshCoupons}
                 refreshSales={needRefreshSales}
                 refreshCouponsFn={setRefreshCoupons}

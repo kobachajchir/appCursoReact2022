@@ -31,6 +31,7 @@ import {
   XOctagonFill,
 } from "react-bootstrap-icons";
 import { GeneralCompany } from "../App";
+import CouponForm from "./CouponForm";
 //import ModifyUserAccount from "./ModifyUserAccount";
 
 export default function UserPanel() {
@@ -44,6 +45,13 @@ export default function UserPanel() {
   const [modifyEnableDisable, setEnableDisable] = useState(false);
   const [filterUserType, setFilterUserType] = useState("all");
   const [searchQuery, setSearchQuery] = useState(""); // State to store the search query
+  const [showModal, setShowModal] = useState(false);
+
+  const handleGiveUserACoupon = (user) => {
+    setSelectedUser(user);
+    setShowModal(true);
+  };
+
   const errorBannerStyle = {
     color: "var(--bs-body-color)",
     backgroundColor: "var(--bs-danger-border-subtle)",
@@ -92,6 +100,7 @@ export default function UserPanel() {
 
   const handleChangeType = (user) => {
     setSelectedUser(user);
+    setNewType(user.status); // Initialize newType to user's current status
     setShowChangeType(true);
   };
 
@@ -116,7 +125,6 @@ export default function UserPanel() {
         auth.currentUser,
         credential
       );
-      console.log(result);
       const userRef = doc(db, "users", selectedUser.id);
       await updateDoc(userRef, { status: newType });
     } catch (error) {
@@ -233,13 +241,18 @@ export default function UserPanel() {
                 <Col>{user.userEmail}</Col>
                 <Col>{user.userPhone}</Col>
                 <Col>
-                  {user.status === "admin"
-                    ? "Administrador"
-                    : user.status === "user"
-                    ? "Usuario"
-                    : user.status === "seller"
-                    ? "Vendedor"
-                    : ""}
+                  {(() => {
+                    switch (user.status) {
+                      case "admin":
+                        return "Administrador";
+                      case "seller":
+                        return "Vendedor";
+                      case "user":
+                        return "Usuario";
+                      default:
+                        return "";
+                    }
+                  })()}
                 </Col>
                 <Col>
                   {user.enabled ? (
@@ -285,6 +298,13 @@ export default function UserPanel() {
                       >
                         Cambiar tipo de cuenta
                       </Dropdown.Item>
+                      {user.status === "user" && (
+                        <Dropdown.Item
+                          onClick={() => handleGiveUserACoupon(user)}
+                        >
+                          Dar un cupon
+                        </Dropdown.Item>
+                      )}
                     </Dropdown.Menu>
                   </Dropdown>
                 </Col>
@@ -364,6 +384,19 @@ export default function UserPanel() {
           </Button>
         </Modal.Footer>
       </Modal>
+      {showModal && (
+        <Modal show={showModal} onHide={() => setShowModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Otorgar cupon a {selectedUser.username}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <CouponForm
+              username={selectedUser.username}
+              onClose={() => setShowModal(false)}
+            />
+          </Modal.Body>
+        </Modal>
+      )}
 
       {/*{showModify && <ModifyUserAccount user={selectedUser} onClose={handleCloseModify} />}*/}
     </Container>
