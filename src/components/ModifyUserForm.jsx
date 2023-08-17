@@ -3,8 +3,9 @@ import { Form, Button, Container, Row, Col, Accordion } from "react-bootstrap";
 import { GeneralCompany } from "../App";
 import AccordionHeader from "react-bootstrap/esm/AccordionHeader";
 import AccordionItem from "react-bootstrap/esm/AccordionItem";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { doc, getDoc, getFirestore, updateDoc } from "firebase/firestore";
 import AccordionBody from "react-bootstrap/esm/AccordionBody";
+import ModifyAddressForm from "./ModifyAddressForm";
 
 export default function ModifyUserForm() {
   const { userInfo, setUserData: updateUserData } = useContext(GeneralCompany);
@@ -17,6 +18,16 @@ export default function ModifyUserForm() {
   const [hasChanged, setHasChanged] = useState(false);
   const [showAddresses, setShowAddresses] = useState(false);
   const [addresses, setAddresses] = useState([]);
+  const [editingAddressIndex, setEditingAddressIndex] = useState(null);
+
+  async function updateAddressInFirestore(docRef, updatedAddress) {
+    try {
+      await updateDoc(docRef, updatedAddress);
+      console.log("Address updated successfully!");
+    } catch (error) {
+      console.error("Error updating address: ", error);
+    }
+  }
 
   async function fetchAddresses() {
     const db = getFirestore();
@@ -147,7 +158,23 @@ export default function ModifyUserForm() {
         </Form.Group>
         <Col
           className="d-flex justify-content-center align-items-center flex-column"
+          style={{ width: "50%", marginTop: "10px" }}
+        >
+          <Button
+            variant="primary"
+            onClick={handleSubmit}
+            disabled={!hasChanged}
+          >
+            Modificar
+          </Button>
+        </Col>
+        <Col
+          className="d-flex justify-content-center align-items-center flex-column"
           xs={12}
+          style={{
+            marginTop: "25px",
+            marginBottom: "10px",
+          }}
         >
           <Button
             onClick={() => setShowAddresses(!showAddresses)}
@@ -172,54 +199,82 @@ export default function ModifyUserForm() {
                       {"Direccion " + (inx + 1)}
                     </AccordionHeader>
                     <AccordionBody className="d-flex justify-content-center align-items-center flex-column text-center">
-                      <p style={{ margin: 0 }}>
-                        <strong>Departamento:</strong> {add.apartment},{" "}
-                        <strong>Piso:</strong> {add.floor}, {add.street}{" "}
-                        {add.number}
-                      </p>
+                      {editingAddressIndex === inx ? (
+                        <ModifyAddressForm
+                          initialAddress={add}
+                          onSave={(updatedAddress) => {
+                            // Fetch Firestore reference to the address document
+                            const db = getFirestore();
+                            const docRef = doc(
+                              db,
+                              userInfo.userAddress[inx].path
+                            ); // Assuming that userAddress contains the path to each address document
 
-                      <div>
-                        <strong>Ciudad:</strong> {add.city}
-                      </div>
-                      <div>
-                        {" "}
-                        <strong>Codigo Postal:</strong> {add.postalCode}
-                      </div>
-                      <div>
-                        <strong>Provincia:</strong> {add.state}
-                      </div>
-                      <div>
-                        <strong>Coordenadas:</strong>
-                        {Object.entries(add.mapLocation)
-                          .map(
-                            (entry, index) =>
-                              `${parseFloat(entry[1]).toFixed(3)}${
-                                index === 0 ? "° S" : "° W"
-                              }`
-                          )
-                          .join(", ")}
-                        <button
-                          style={{
-                            backgroundColor: "var(--bs-dark-bg-subtle)",
-                            border: "none",
-                            color: "var(--bs-secondary-text-emphasis)",
-                            marginLeft: "10px",
+                            // Update the address in Firestore
+                            updateAddressInFirestore(docRef, updatedAddress);
+
+                            // Update the address in the local state
+                            const newAddresses = [...addresses];
+                            newAddresses[inx] = updatedAddress;
+                            setAddresses(newAddresses);
+
+                            // Reset editingAddressIndex
+                            setEditingAddressIndex(null);
                           }}
-                          onClick={() => handleViewOnMap(add.mapLocation)}
-                        >
-                          Ver en mapa
-                        </button>
-                      </div>
-                      <Button
-                        style={{
-                          backgroundColor: "var(--bs-dark-bg-subtle)",
-                          border: "none",
-                          color: "var(--bs-secondary-text-emphasis)",
-                          marginTop: "10px",
-                        }}
-                      >
-                        Modificar direccion
-                      </Button>
+                        />
+                      ) : (
+                        <>
+                          <p style={{ margin: 0 }}>
+                            <strong>Departamento:</strong> {add.apartment},{" "}
+                            <strong>Piso:</strong> {add.floor}, {add.street}{" "}
+                            {add.number}
+                          </p>
+
+                          <div>
+                            <strong>Ciudad:</strong> {add.city}
+                          </div>
+                          <div>
+                            {" "}
+                            <strong>Codigo Postal:</strong> {add.postalCode}
+                          </div>
+                          <div>
+                            <strong>Provincia:</strong> {add.state}
+                          </div>
+                          <div>
+                            <strong>Coordenadas:</strong>
+                            {Object.entries(add.mapLocation)
+                              .map(
+                                (entry, index) =>
+                                  `${parseFloat(entry[1]).toFixed(3)}${
+                                    index === 0 ? "° S" : "° W"
+                                  }`
+                              )
+                              .join(", ")}
+                            <button
+                              style={{
+                                backgroundColor: "var(--bs-dark-bg-subtle)",
+                                border: "none",
+                                color: "var(--bs-secondary-text-emphasis)",
+                                marginLeft: "10px",
+                              }}
+                              onClick={() => handleViewOnMap(add.mapLocation)}
+                            >
+                              Ver en mapa
+                            </button>
+                          </div>
+                          <Button
+                            style={{
+                              backgroundColor: "var(--bs-dark-bg-subtle)",
+                              border: "none",
+                              color: "var(--bs-secondary-text-emphasis)",
+                              marginTop: "10px",
+                            }}
+                            onClick={() => setEditingAddressIndex(inx)}
+                          >
+                            Modificar direccion
+                          </Button>
+                        </>
+                      )}
                     </AccordionBody>
                   </AccordionItem>
                 );
@@ -227,18 +282,6 @@ export default function ModifyUserForm() {
             </Accordion>
           </Col>
         )}
-        <Col
-          className="d-flex justify-content-center align-items-center flex-column"
-          style={{ width: "50%", marginTop: "10px" }}
-        >
-          <Button
-            variant="primary"
-            onClick={handleSubmit}
-            disabled={!hasChanged}
-          >
-            Modificar
-          </Button>
-        </Col>
       </Form>
     </Container>
   );

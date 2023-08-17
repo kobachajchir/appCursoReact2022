@@ -3,6 +3,15 @@ import { Card, Button } from "react-bootstrap";
 import CouponForm from "./CouponForm";
 
 export default function CouponCard({ coupon, children, style }) {
+  let username = null;
+  const couponCode = () => {
+    const match = String(coupon.code).match(/^usercoupon(.+)$/);
+    if (match && match[1]) {
+      username = match[1]; // Extracting the username
+      return "Cupon de Usuario";
+    }
+    return coupon.code; // If not starting with "usercoupon", just return the original code.
+  };
   const textStyles = {
     margin: 0,
     marginTop: "5px",
@@ -14,7 +23,7 @@ export default function CouponCard({ coupon, children, style }) {
     <Card style={style}>
       <Card.Body>
         <>
-          <Card.Title>{coupon.code}</Card.Title>
+          <Card.Title>{couponCode()}</Card.Title>
           <Card.Subtitle>
             {isExpired && (
               <span style={{ color: "red", fontWeight: "bold" }}>
@@ -23,6 +32,9 @@ export default function CouponCard({ coupon, children, style }) {
               </span>
             )}
           </Card.Subtitle>
+          {username && (
+            <Card.Text style={textStyles}>Usuario: {username}</Card.Text>
+          )}
           <Card.Text style={textStyles}>
             Porcentaje de descuento: {coupon.discountPercentage}
           </Card.Text>

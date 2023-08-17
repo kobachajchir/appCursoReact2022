@@ -78,6 +78,13 @@ function ContactDetailMessage({
     <Container fluid>
       <Row style={{ marginTop: "10px", marginBottom: "10px" }}>
         <Col xs={12}>
+          {!localMessage.resolved ? (
+            <CheckCircle size={90} style={{ marginBottom: "10px" }} />
+          ) : (
+            <CheckCircleFill size={90} style={{ marginBottom: "10px" }} />
+          )}
+        </Col>
+        <Col xs={12}>
           <h3>{localMessage.subject}</h3>
         </Col>
         <Col xs={12}>

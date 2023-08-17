@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Form, Button, ListGroup, Row, Col } from "react-bootstrap";
 import {
   Timestamp,
@@ -27,6 +27,8 @@ export default function SaleForm({ sale, onSubmit, onClose }) {
     sale ? sale.productElegibles : []
   );
   const [products, setProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [displayedProducts, setDisplayedProducts] = useState("");
 
   const db = getFirestore();
   const fetchProducts = async () => {
@@ -38,6 +40,7 @@ export default function SaleForm({ sale, onSubmit, onClose }) {
   useEffect(() => {
     fetchProducts().then((results) => {
       setProducts(results);
+      setDisplayedProducts(results);
     });
   }, []);
 
@@ -51,6 +54,22 @@ export default function SaleForm({ sale, onSubmit, onClose }) {
       setSelectedProducts(sale.productElegibles);
     }
   }, [sale]);
+
+  const handleSearch = useCallback(
+    (value) => {
+      if (value !== "") {
+        const filteredProducts = products.filter(
+          (product) =>
+            product.code.includes(value) ||
+            product.title.toLowerCase().includes(value.toLowerCase())
+        );
+        setDisplayedProducts(filteredProducts);
+      } else {
+        setDisplayedProducts(products);
+      }
+    },
+    [products]
+  );
 
   const handleProductSelect = (productCode) => {
     setSelectedProducts((prevSelected) => {
@@ -162,10 +181,25 @@ export default function SaleForm({ sale, onSubmit, onClose }) {
             required
           />
         </Form.Group>
-        <Form.Label style={labelStyles}>Productos participantes</Form.Label>
-        <ListGroup>
-          {products &&
-            products.map((product) => (
+        <div className="d-flex flex-column align-items-center">
+          <Form.Label style={labelStyles}>Productos participantes</Form.Label>
+          <input
+            style={{ ...inputStyles, width: "100%", marginBottom: "10px" }}
+            type="text"
+            defaultValue={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder="Nombre o codigo de producto"
+          ></input>
+        </div>
+        <ListGroup
+          style={{
+            maxHeight: "200px",
+            overflowY: "auto",
+            overflowX: "hidden",
+          }}
+        >
+          {displayedProducts &&
+            displayedProducts.map((product) => (
               <ListGroup.Item
                 key={product.id}
                 style={{
