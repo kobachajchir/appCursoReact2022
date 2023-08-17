@@ -51,11 +51,9 @@ export default function AdminPage() {
             <Nav.Item>
               <Nav.Link eventKey="orders">Ventas</Nav.Link>
             </Nav.Item>
-            {admin && (
-              <Nav.Item>
-                <Nav.Link eventKey="users">Usuarios</Nav.Link>
-              </Nav.Item>
-            )}
+            <Nav.Item>
+              <Nav.Link eventKey="users">Usuarios</Nav.Link>
+            </Nav.Item>
             <Nav.Item>
               <Nav.Link eventKey="contact">Contacto</Nav.Link>
             </Nav.Item>

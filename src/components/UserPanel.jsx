@@ -34,7 +34,7 @@ import { GeneralCompany } from "../App";
 import CouponForm from "./CouponForm";
 //import ModifyUserAccount from "./ModifyUserAccount";
 
-export default function UserPanel() {
+export default function UserPanel(props) {
   const [users, setUsersList] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newType, setNewType] = useState("");
@@ -43,7 +43,10 @@ export default function UserPanel() {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [modifyEnableDisable, setEnableDisable] = useState(false);
-  const [filterUserType, setFilterUserType] = useState("all");
+  const { isUserSeller: isUserSeller } = useContext(GeneralCompany);
+  const [filterUserType, setFilterUserType] = useState(
+    isUserSeller ? "user" : "all"
+  );
   const [searchQuery, setSearchQuery] = useState(""); // State to store the search query
   const [showModal, setShowModal] = useState(false);
 
@@ -179,22 +182,27 @@ export default function UserPanel() {
         className="d-flex justify-content-center align-items-center text-center flex-row"
         style={{ marginBottom: "10px", width: "100%" }}
       >
-        <Col xs={"auto"}>
-          <h5 style={{ margin: 0 }}>Mostrar</h5>
-        </Col>
-        <Col xs={"auto"}>
-          <select
-            value={filterUserType}
-            style={inputStyles}
-            onChange={(e) => setFilterUserType(e.target.value)}
-            onSelect={(e) => setFilterUserType(e.target.value)}
-          >
-            <option value="all">Todos</option>
-            <option value="user">Usuarios</option>
-            <option value="seller">Vendedores</option>
-            <option value="admin">Administradores</option>
-          </select>
-        </Col>
+        {!isUserSeller && (
+          <>
+            <Col xs={"auto"}>
+              <h5 style={{ margin: 0 }}>Mostrar</h5>
+            </Col>
+            <Col xs={"auto"}>
+              <select
+                value={filterUserType}
+                style={inputStyles}
+                onChange={(e) => setFilterUserType(e.target.value)}
+                onSelect={(e) => setFilterUserType(e.target.value)}
+                disabled={isUserSeller}
+              >
+                <option value="all">Todos</option>
+                <option value="user">Usuarios</option>
+                <option value="seller">Vendedores</option>
+                <option value="admin">Administradores</option>
+              </select>
+            </Col>
+          </>
+        )}
         <div className="w-100"></div>
         <Col xs={"auto"}>
           <h5 style={{ margin: 0 }}>Buscar</h5>
