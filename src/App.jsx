@@ -50,6 +50,11 @@ const firebaseConfig = {
   messagingSenderId: "399612336262",
   appId: "1:399612336262:web:6ce144e7f2f050b6541907",
 };
+
+import { initMercadoPago } from "@mercadopago/sdk-react";
+const mp = initMercadoPago("TEST-fa01d94d-942c-445c-bc8e-02009597609f", {
+  locale: "es-AR",
+});
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
@@ -72,6 +77,7 @@ function App() {
   const [companyDocRef, setCompanyRef] = useState(null);
   const isUserAdmin = userInfo.status === "admin" ? true : false;
   const isUserSeller = userInfo.status === "seller" ? true : false;
+
   const handleLoginError = (error) => {
     console.log(error);
     setError(error);
